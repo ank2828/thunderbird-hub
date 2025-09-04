@@ -1,16 +1,17 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { instantlyApi } from '../services/instantly';
-import type { CampaignAnalytics } from '../services/instantly';
+import type { CampaignData } from '../services/instantly';
 
 interface CampaignOverviewProps {
   allowAnimations?: boolean;
+  campaignId?: string;
 }
 
-const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) => {
-  const [campaignData, setCampaignData] = useState<CampaignAnalytics | null>(null);
+const CampaignOverview = ({ allowAnimations = false, campaignId }: CampaignOverviewProps) => {
+  const [campaignData, setCampaignData] = useState<CampaignData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  // Removed lastUpdated since UI controls were removed
   const [isPolling] = useState(true); // Always polling, no toggle needed
   // Remove dataLoaded - using individual animation states now
   const [animationState, setAnimationState] = useState({
@@ -53,25 +54,25 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
   const fetchCampaignData = useCallback(async (isInitialLoad = false) => {
     try {
       if (isInitialLoad) setLoading(true);
-      setError(null);
-      console.log('Starting API call...');
+        setError(null);
+        console.log('Starting API call...');
+        
+      const data = await instantlyApi.getCampaignData(campaignId);
+      console.log('Complete Campaign Data Response:', data);
       
-      const campaigns = await instantlyApi.getCampaignAnalytics();
-      console.log('Campaign Analytics Response:', campaigns);
-      
-      if (campaigns && campaigns.length > 0) {
-        console.log('Setting campaign data:', campaigns[0]);
-        setCampaignData(campaigns[0]);
-        setLastUpdated(new Date());
-      } else {
-        console.log('No campaigns found in response');
-        setError('No campaigns found');
-      }
-    } catch (err) {
-      console.error('API Error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-      setError(`Failed to load campaign data: ${errorMessage}`);
-    } finally {
+      if (data) {
+        console.log('Setting campaign data:', data);
+        setCampaignData(data);
+        // Update timestamp removed with UI controls
+        } else {
+        console.log('No campaign data found in response');
+        setError('No campaign data found');
+        }
+      } catch (err) {
+        console.error('API Error:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+        setError(`Failed to load campaign data: ${errorMessage}`);
+      } finally {
       if (isInitialLoad) setLoading(false);
     }
   }, []);
@@ -196,21 +197,39 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Email Account</div>
-              <div className="text-sm font-semibold text-slate-900">alex@thunderbird-labs.com</div>
+              <div className="text-sm font-semibold text-slate-900">
+                {(() => {
+                  const emailList = campaignData?.details?.email_list;
+                  if (!emailList) return 'Not Available';
+                  if (Array.isArray(emailList)) {
+                    return emailList.length > 1 
+                      ? `${emailList[0]} +${emailList.length - 1} more`
+                      : emailList[0] || 'Not Available';
+                  }
+                  return emailList;
+                })()}
+              </div>
             </div>
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Daily Limit</div>
               <div className="text-sm font-semibold text-slate-900">
-                {lastUpdated ? '7 emails/day' : '5 emails/day'} {/* Will update from API when available */}
+                {campaignData?.details?.daily_limit ? `${campaignData.details.daily_limit} emails/day` : 'Not Set'}
               </div>
             </div>
             <div className="flex flex-col gap-1">
-              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Sequence</div>
-              <div className="text-sm font-semibold text-slate-900">1 step sequence</div>
+              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Campaign Type</div>
+              <div className="text-sm font-semibold text-slate-900">
+                {campaignData?.analytics?.campaign_is_evergreen ? 'Evergreen' : 'Standard'}
+              </div>
             </div>
             <div className="flex flex-col gap-1">
-              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Created</div>
-              <div className="text-sm font-semibold text-slate-900">Aug 29, 2025</div>
+              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Completion Rate</div>
+              <div className="text-sm font-semibold text-slate-900">
+                {campaignData?.analytics?.leads_count && campaignData?.analytics?.leads_count > 0 
+                  ? `${((campaignData.analytics.completed_count / campaignData.analytics.leads_count) * 100).toFixed(1)}%`
+                  : '0%'
+                }
+              </div>
             </div>
           </div>
         </div>
@@ -237,7 +256,7 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
             </div>
           </div>
           <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2">
-            {campaignData.leads_count?.toLocaleString() || 0}
+            {campaignData?.analytics?.leads_count?.toLocaleString() || 0}
           </div>
           <div className="text-xs text-slate-500 font-medium">In campaign database</div>
         </div>
@@ -259,7 +278,7 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
             </div>
           </div>
           <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2">
-            {campaignData.emails_sent_count?.toLocaleString() || 0}
+            {campaignData?.analytics?.emails_sent_count?.toLocaleString() || 0}
           </div>
           <div className="text-xs text-slate-500 font-medium">Total outreach</div>
         </div>
@@ -281,11 +300,11 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
             </div>
           </div>
           <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2">
-            {campaignData.open_count?.toLocaleString() || 0}
+            {campaignData?.analytics?.open_count?.toLocaleString() || 0}
           </div>
           <div className="text-xs text-slate-500 font-medium">Email opens</div>
           <div className="text-xs font-semibold mt-2 text-green-600">
-            {campaignData.emails_sent_count > 0 ? ((campaignData.open_count / campaignData.emails_sent_count) * 100).toFixed(1) : 0}%
+            {campaignData?.analytics?.emails_sent_count && campaignData.analytics.emails_sent_count > 0 ? ((campaignData.analytics.open_count / campaignData.analytics.emails_sent_count) * 100).toFixed(1) : 0}%
           </div>
         </div>
         
@@ -305,11 +324,11 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
             </div>
           </div>
           <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2">
-            {campaignData.reply_count?.toLocaleString() || 0}
+            {campaignData?.analytics?.reply_count?.toLocaleString() || 0}
           </div>
           <div className="text-xs text-slate-500 font-medium">Responses received</div>
           <div className="text-xs font-semibold mt-2 text-red-600">
-            {campaignData.emails_sent_count > 0 ? ((campaignData.reply_count / campaignData.emails_sent_count) * 100).toFixed(1) : 0}%
+            {campaignData?.analytics?.emails_sent_count && campaignData.analytics.emails_sent_count > 0 ? ((campaignData.analytics.reply_count / campaignData.analytics.emails_sent_count) * 100).toFixed(1) : 0}%
           </div>
         </div>
       </div>
@@ -327,7 +346,7 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
             <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Contacted</div>
               <div className="text-xl font-bold text-slate-900">
-                {campaignData.contacted_count?.toLocaleString() || 0}
+                {campaignData?.analytics?.contacted_count?.toLocaleString() || 0}
               </div>
               <div className="text-xs text-slate-500 font-medium opacity-70">Leads reached</div>
             </div>
@@ -335,7 +354,7 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
             <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">New Contacted</div>
               <div className="text-xl font-bold text-slate-900">
-                {campaignData.new_leads_contacted_count?.toLocaleString() || 0}
+                {campaignData?.analytics?.new_leads_contacted_count?.toLocaleString() || 0}
               </div>
               <div className="text-xs text-slate-500 font-medium opacity-70">Fresh outreach</div>
             </div>
@@ -343,17 +362,17 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
             <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Link Clicks</div>
               <div className="text-xl font-bold text-slate-900">
-                {campaignData.link_click_count?.toLocaleString() || 0}
+                {campaignData?.analytics?.link_click_count?.toLocaleString() || 0}
               </div>
               <div className="text-xs text-slate-500 font-medium opacity-70">
-                {campaignData.emails_sent_count > 0 ? ((campaignData.link_click_count / campaignData.emails_sent_count) * 100).toFixed(1) : 0}% rate
+                {campaignData?.analytics?.emails_sent_count && campaignData.analytics.emails_sent_count > 0 ? ((campaignData.analytics.link_click_count / campaignData.analytics.emails_sent_count) * 100).toFixed(1) : 0}% rate
               </div>
             </div>
             
             <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Completed</div>
               <div className="text-xl font-bold text-slate-900">
-                {campaignData.completed_count?.toLocaleString() || 0}
+                {campaignData?.analytics?.completed_count?.toLocaleString() || 0}
               </div>
               <div className="text-xs text-slate-500 font-medium opacity-70">Sequence done</div>
             </div>
@@ -361,20 +380,20 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
             <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Bounced</div>
               <div className="text-xl font-bold text-slate-900">
-                {campaignData.bounced_count?.toLocaleString() || 0}
+                {campaignData?.analytics?.bounced_count?.toLocaleString() || 0}
               </div>
               <div className="text-xs text-slate-500 font-medium opacity-70">
-                {campaignData.emails_sent_count > 0 ? ((campaignData.bounced_count / campaignData.emails_sent_count) * 100).toFixed(1) : 0}% rate
+                {campaignData?.analytics?.emails_sent_count && campaignData.analytics.emails_sent_count > 0 ? ((campaignData.analytics.bounced_count / campaignData.analytics.emails_sent_count) * 100).toFixed(1) : 0}% rate
               </div>
             </div>
             
             <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Opportunities</div>
               <div className="text-xl font-bold text-slate-900">
-                {campaignData.total_opportunities?.toLocaleString() || 0}
+                {campaignData?.analytics?.total_opportunities?.toLocaleString() || 0}
               </div>
               <div className="text-xs text-slate-500 font-medium opacity-70">
-                ${campaignData.total_opportunity_value?.toLocaleString() || 0} value
+                ${campaignData?.analytics?.total_opportunity_value?.toLocaleString() || 0} value
               </div>
             </div>
           </div>

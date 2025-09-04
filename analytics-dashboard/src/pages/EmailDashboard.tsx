@@ -1,14 +1,15 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import CampaignOverview from '../components/CampaignOverview'
 import { instantlyApi } from '../services/instantly'
-import type { CampaignAnalytics } from '../services/instantly'
+import type { CampaignData } from '../services/instantly'
 import { useTransition } from '../contexts/TransitionContext'
 
 function EmailDashboard() {
+  const { campaignId } = useParams<{ campaignId: string }>()
   const navigate = useNavigate()
   const { completeTransition } = useTransition()
-  const [campaignData, setCampaignData] = useState<CampaignAnalytics | null>(null)
+  const [campaignData, setCampaignData] = useState<CampaignData | null>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [allowCardAnimations, setAllowCardAnimations] = useState(false)
 
@@ -26,15 +27,30 @@ function EmailDashboard() {
       default:
         return { text: 'Unknown', class: 'bg-gray-100 text-gray-800' };
     }
+  }
+
+  // Smart status detection - prioritize details endpoint over analytics
+  const getCurrentStatus = (campaignData: any) => {
+    // Try details endpoint first (more current)
+    const detailsStatus = campaignData?.details?.campaign_status ?? campaignData?.details?.status;
+    if (detailsStatus !== undefined) {
+      console.log('Using status from details endpoint:', detailsStatus);
+      return detailsStatus;
+    }
+    
+    // Fallback to analytics endpoint
+    const analyticsStatus = campaignData?.analytics?.campaign_status;
+    console.log('Using status from analytics endpoint:', analyticsStatus);
+    return analyticsStatus;
   };
 
   // Handle transition and data loading
   useEffect(() => {
     const fetchCampaignData = async () => {
       try {
-        const campaigns = await instantlyApi.getCampaignAnalytics();
-        if (campaigns && campaigns.length > 0) {
-          setCampaignData(campaigns[0]);
+        const data = await instantlyApi.getCampaignData(campaignId);
+        if (data) {
+          setCampaignData(data);
         }
       } catch (err) {
         console.error('Error fetching campaign data for header:', err);
@@ -54,10 +70,42 @@ function EmailDashboard() {
       completeTransition() // Clean up transition state
     }, 900)
 
+    // Initial data fetch
     fetchCampaignData();
+
+    // Set up polling for real-time status updates
+    const POLL_INTERVAL = 30000; // 30 seconds (same as CampaignOverview)
+    let intervalId: NodeJS.Timeout;
+    let isTabVisible = true;
+
+    // Handle tab visibility changes
+    const handleVisibilityChange = () => {
+      isTabVisible = !document.hidden;
+      if (isTabVisible) {
+        // Refresh immediately when tab becomes visible
+        fetchCampaignData();
+      }
+    };
+
+    // Start polling
+    intervalId = setInterval(() => {
+      if (isTabVisible) {
+        fetchCampaignData();
+      }
+    }, POLL_INTERVAL);
+
+    // Listen for tab visibility changes
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [completeTransition]);
 
-  const status = campaignData ? getStatusText(campaignData.campaign_status) : { text: 'Loading...', class: 'bg-gray-100 text-gray-800' };
+  const currentStatusValue = campaignData ? getCurrentStatus(campaignData) : undefined;
+  const status = currentStatusValue !== undefined ? getStatusText(currentStatusValue) : { text: 'Loading...', class: 'bg-gray-100 text-gray-800' };
 
   return (
     <div 
@@ -72,15 +120,15 @@ function EmailDashboard() {
       {/* Dashboard Header */}
       <div className="flex justify-between items-center mb-8">
         <button
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/email-campaigns')}
           className="bg-white bg-opacity-20 backdrop-blur-lg border-0 text-white px-6 py-3 rounded-xl cursor-pointer text-sm font-medium hover:bg-opacity-30 hover:-translate-y-0.5 transition-all duration-300"
         >
-          ← Back to Hub
+          ← Back to Campaigns
         </button>
         
-        {campaignData?.campaign_name && (
+        {campaignData?.analytics?.campaign_name && (
           <h1 className="text-white text-4xl font-bold drop-shadow-lg" style={{ fontFamily: 'Montserrat, system-ui, sans-serif' }}>
-            {campaignData.campaign_name}
+            {campaignData.analytics.campaign_name}
           </h1>
         )}
         
@@ -90,7 +138,7 @@ function EmailDashboard() {
       </div>
 
       {/* Content */}
-      <CampaignOverview allowAnimations={allowCardAnimations} />
+      <CampaignOverview allowAnimations={allowCardAnimations} campaignId={campaignId} />
     </div>
   )
 }

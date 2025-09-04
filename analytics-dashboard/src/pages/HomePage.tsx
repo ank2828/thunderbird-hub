@@ -21,7 +21,7 @@ function HomePage() {
     requestAnimationFrame(() => {
       // Phase 2: Navigate after elegant fade completes (600ms)
       setTimeout(() => {
-        const routePath = destination === 'email' ? '/email-dashboard' : '/linkedin-dashboard'
+        const routePath = destination === 'email' ? '/email-campaigns' : '/linkedin-dashboard'
         navigate(routePath)
       }, 600)
     })
