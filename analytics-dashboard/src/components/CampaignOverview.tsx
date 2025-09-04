@@ -11,7 +11,7 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const [isPolling, setIsPolling] = useState(true);
+  const [isPolling] = useState(true); // Always polling, no toggle needed
   // Remove dataLoaded - using individual animation states now
   const [animationState, setAnimationState] = useState({
     overview: false,
@@ -209,20 +209,7 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
         <div className="p-5 border-b border-black border-opacity-6 flex justify-between items-center">
           <h2 className="text-base font-semibold text-slate-900 tracking-tight">Campaign Overview</h2>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsPolling(!isPolling)}
-                className={`w-6 h-6 rounded-full transition-all duration-200 ${
-                  isPolling ? 'bg-green-500' : 'bg-slate-300'
-                }`}
-                title={isPolling ? 'Auto-refresh ON (30s)' : 'Auto-refresh OFF'}
-              >
-                <div className={`w-2 h-2 rounded-full bg-white mx-auto transition-transform duration-200 ${
-                  isPolling ? 'scale-100' : 'scale-75'
-                }`} />
-              </button>
-              <span className="text-xs text-slate-500">Updated {formatLastUpdated()}</span>
-            </div>
+            <span className="text-xs text-slate-500">Updated {formatLastUpdated()}</span>
             <button
               onClick={handleManualRefresh}
               className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105"
