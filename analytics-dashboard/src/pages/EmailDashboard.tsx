@@ -3,10 +3,13 @@ import { useState, useEffect } from 'react'
 import CampaignOverview from '../components/CampaignOverview'
 import { instantlyApi } from '../services/instantly'
 import type { CampaignAnalytics } from '../services/instantly'
+import { useTransition } from '../contexts/TransitionContext'
 
 function EmailDashboard() {
   const navigate = useNavigate()
+  const { completeTransition } = useTransition()
   const [campaignData, setCampaignData] = useState<CampaignAnalytics | null>(null)
+  const [isVisible, setIsVisible] = useState(false)
 
   // Function to convert status number to readable text
   const getStatusText = (status: number) => {
@@ -24,7 +27,7 @@ function EmailDashboard() {
     }
   };
 
-  // Fetch campaign data for header
+  // Handle transition and data loading
   useEffect(() => {
     const fetchCampaignData = async () => {
       try {
@@ -37,16 +40,29 @@ function EmailDashboard() {
       }
     };
 
+    // Start page visibility animation after transition overlay begins
+    setTimeout(() => {
+      setIsVisible(true)
+    }, 400)
+
+    // Complete the global transition
+    setTimeout(() => {
+      completeTransition()
+    }, 1000)
+
     fetchCampaignData();
-  }, []);
+  }, [completeTransition]);
 
   const status = campaignData ? getStatusText(campaignData.campaign_status) : { text: 'Loading...', class: 'bg-gray-100 text-gray-800' };
 
   return (
     <div 
-      className="min-h-screen p-8"
+      className="min-h-screen p-8 gpu-accelerated"
       style={{
-        background: 'linear-gradient(135deg, #f87171, #fb923c, #f97316)'
+        background: 'linear-gradient(135deg, #f87171, #fb923c, #f97316)',
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'scale(1)' : 'scale(1.05)',
+        transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
       {/* Dashboard Header */}

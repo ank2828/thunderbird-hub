@@ -116,14 +116,18 @@ const CampaignOverview = () => {
   // const clickRate = campaignData.emails_sent_count > 0 ? (campaignData.link_click_count / campaignData.emails_sent_count) * 100 : 0;
 
   return (
-    <div className="max-w-7xl mx-auto" style={{
-      opacity: dataLoaded ? 1 : 0,
-      transform: dataLoaded ? 'scale(1) translateZ(0)' : 'scale(0.95) translateZ(-10px)',
-      transition: 'opacity 0.6s ease-out, transform 0.6s ease-out'
-    }}>
+    <div className="max-w-7xl mx-auto">
       
       {/* Campaign Overview */}
-      <div className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden mb-6">
+      <div 
+        className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden mb-6 gpu-accelerated"
+        style={{
+          opacity: dataLoaded ? 1 : 0,
+          transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+          transitionDelay: '0ms'
+        }}
+      >
         <div className="p-5 border-b border-black border-opacity-6">
           <h2 className="text-base font-semibold text-slate-900 tracking-tight">Campaign Overview</h2>
         </div>
@@ -151,7 +155,15 @@ const CampaignOverview = () => {
       
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl">
+        <div 
+          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated"
+          style={{
+            opacity: dataLoaded ? 1 : 0,
+            transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+            transitionDelay: '100ms'
+          }}
+        >
           <div className="flex justify-between items-start mb-4">
             <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Leads</div>
             <div className="w-6 h-6 flex items-center justify-center text-xs opacity-60">
@@ -163,18 +175,21 @@ const CampaignOverview = () => {
               </svg>
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2"
-               style={{
-                 opacity: dataLoaded ? 1 : 0,
-                 transform: dataLoaded ? 'scale(1)' : 'scale(0.9)',
-                 transition: 'opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s'
-               }}>
-            {dataLoaded ? (campaignData.leads_count?.toLocaleString() || 0) : ''}
+          <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2">
+            {campaignData.leads_count?.toLocaleString() || 0}
           </div>
           <div className="text-xs text-slate-500 font-medium">In campaign database</div>
         </div>
         
-        <div className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl">
+        <div 
+          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated"
+          style={{
+            opacity: dataLoaded ? 1 : 0,
+            transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+            transitionDelay: '200ms'
+          }}
+        >
           <div className="flex justify-between items-start mb-4">
             <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Emails Sent</div>
             <div className="w-6 h-6 flex items-center justify-center text-xs opacity-60">
@@ -184,18 +199,21 @@ const CampaignOverview = () => {
               </svg>
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2"
-               style={{
-                 opacity: dataLoaded ? 1 : 0,
-                 transform: dataLoaded ? 'scale(1)' : 'scale(0.9)',
-                 transition: 'opacity 0.5s ease-out 0.3s, transform 0.5s ease-out 0.3s'
-               }}>
-            {dataLoaded ? (campaignData.emails_sent_count?.toLocaleString() || 0) : ''}
+          <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2">
+            {campaignData.emails_sent_count?.toLocaleString() || 0}
           </div>
           <div className="text-xs text-slate-500 font-medium">Total outreach</div>
         </div>
         
-        <div className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl">
+        <div 
+          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated"
+          style={{
+            opacity: dataLoaded ? 1 : 0,
+            transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+            transitionDelay: '300ms'
+          }}
+        >
           <div className="flex justify-between items-start mb-4">
             <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Opens</div>
             <div className="w-6 h-6 flex items-center justify-center text-xs opacity-60">
@@ -205,13 +223,8 @@ const CampaignOverview = () => {
               </svg>
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2"
-               style={{
-                 opacity: dataLoaded ? 1 : 0,
-                 transform: dataLoaded ? 'scale(1)' : 'scale(0.9)',
-                 transition: 'opacity 0.5s ease-out 0.4s, transform 0.5s ease-out 0.4s'
-               }}>
-            {dataLoaded ? (campaignData.open_count?.toLocaleString() || 0) : ''}
+          <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2">
+            {campaignData.open_count?.toLocaleString() || 0}
           </div>
           <div className="text-xs text-slate-500 font-medium">Email opens</div>
           <div className="text-xs font-semibold mt-2 text-green-600">
@@ -219,7 +232,15 @@ const CampaignOverview = () => {
           </div>
         </div>
         
-        <div className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl">
+        <div 
+          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated"
+          style={{
+            opacity: dataLoaded ? 1 : 0,
+            transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+            transitionDelay: '400ms'
+          }}
+        >
           <div className="flex justify-between items-start mb-4">
             <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Replies</div>
             <div className="w-6 h-6 flex items-center justify-center text-xs opacity-60">
@@ -228,13 +249,8 @@ const CampaignOverview = () => {
               </svg>
             </div>
           </div>
-          <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2"
-               style={{
-                 opacity: dataLoaded ? 1 : 0,
-                 transform: dataLoaded ? 'scale(1)' : 'scale(0.9)',
-                 transition: 'opacity 0.5s ease-out 0.5s, transform 0.5s ease-out 0.5s'
-               }}>
-            {dataLoaded ? (campaignData.reply_count?.toLocaleString() || 0) : ''}
+          <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2">
+            {campaignData.reply_count?.toLocaleString() || 0}
           </div>
           <div className="text-xs text-slate-500 font-medium">Responses received</div>
           <div className="text-xs font-semibold mt-2 text-red-600">
@@ -244,7 +260,15 @@ const CampaignOverview = () => {
       </div>
       
       {/* Performance Details */}
-      <div className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden">
+      <div 
+        className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden gpu-accelerated"
+        style={{
+          opacity: dataLoaded ? 1 : 0,
+          transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
+          transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+          transitionDelay: '500ms'
+        }}
+      >
         <div className="p-5 border-b border-black border-opacity-6">
           <h2 className="text-base font-semibold text-slate-900 tracking-tight">Performance Breakdown</h2>
         </div>

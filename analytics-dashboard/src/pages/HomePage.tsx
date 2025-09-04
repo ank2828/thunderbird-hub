@@ -1,9 +1,11 @@
 import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import FlowingLines from '../components/FlowingLines'
+import { useTransition } from '../contexts/TransitionContext'
 
 function HomePage() {
   const navigate = useNavigate()
+  const { startTransition } = useTransition()
   const [activeButton, setActiveButton] = useState<'email' | 'linkedin' | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
   const [screenDimensions, setScreenDimensions] = useState({ width: 1920, height: 1080 })
@@ -34,11 +36,14 @@ function HomePage() {
     setIsAnimating(true)
     setActiveButton(destination)
     
-    // Wait for animation to complete before navigating
+    // Start the seamless transition
+    startTransition(destination)
+    
+    // Navigate immediately - the transition overlay handles the visual continuity
     setTimeout(() => {
       const routePath = destination === 'email' ? '/email-dashboard' : '/linkedin-dashboard'
       navigate(routePath)
-    }, 1200) // Match animation duration
+    }, 600) // Reduced timing for smoother handoff
   }
 
   return (
