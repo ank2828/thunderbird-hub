@@ -10,6 +10,8 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
   const [campaignData, setCampaignData] = useState<CampaignAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [isPolling, setIsPolling] = useState(true);
   // Remove dataLoaded - using individual animation states now
   const [animationState, setAnimationState] = useState({
     overview: false,
@@ -47,35 +49,72 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
     };
   }, []);
 
+  // Smart data fetching with polling
+  const fetchCampaignData = useCallback(async (isInitialLoad = false) => {
+    try {
+      if (isInitialLoad) setLoading(true);
+      setError(null);
+      console.log('Starting API call...');
+      
+      const campaigns = await instantlyApi.getCampaignAnalytics();
+      console.log('Campaign Analytics Response:', campaigns);
+      
+      if (campaigns && campaigns.length > 0) {
+        console.log('Setting campaign data:', campaigns[0]);
+        setCampaignData(campaigns[0]);
+        setLastUpdated(new Date());
+      } else {
+        console.log('No campaigns found in response');
+        setError('No campaigns found');
+      }
+    } catch (err) {
+      console.error('API Error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
+      setError(`Failed to load campaign data: ${errorMessage}`);
+    } finally {
+      if (isInitialLoad) setLoading(false);
+    }
+  }, []);
+
+  // Initial data fetch
   useEffect(() => {
-    const fetchCampaignData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        console.log('Starting API call...');
-        
-        const campaigns = await instantlyApi.getCampaignAnalytics();
-        console.log('Campaign Analytics Response:', campaigns);
-        
-        if (campaigns && campaigns.length > 0) {
-          console.log('Setting campaign data:', campaigns[0]);
-          setCampaignData(campaigns[0]);
-          // Data loaded - animations will be triggered separately when allowed
-        } else {
-          console.log('No campaigns found in response');
-          setError('No campaigns found');
-        }
-      } catch (err) {
-        console.error('API Error:', err);
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-        setError(`Failed to load campaign data: ${errorMessage}`);
-      } finally {
-        setLoading(false);
+    fetchCampaignData(true);
+  }, [fetchCampaignData]);
+
+  // Smart polling effect
+  useEffect(() => {
+    if (!isPolling) return;
+
+    const POLL_INTERVAL = 30000; // 30 seconds
+    let intervalId: NodeJS.Timeout;
+    let isTabVisible = true;
+
+    // Handle tab visibility changes
+    const handleVisibilityChange = () => {
+      isTabVisible = !document.hidden;
+      if (isTabVisible && campaignData) {
+        // Refresh immediately when tab becomes visible
+        fetchCampaignData(false);
       }
     };
 
-    fetchCampaignData();
-  }, [animationConfig]);
+    // Only poll when tab is visible
+    const startPolling = () => {
+      intervalId = setInterval(() => {
+        if (isTabVisible) {
+          fetchCampaignData(false);
+        }
+      }, POLL_INTERVAL);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    startPolling();
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isPolling, fetchCampaignData, campaignData]);
 
   // Separate effect to handle animation triggering when allowed
   useEffect(() => {
@@ -140,6 +179,25 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
   // const bounceRate = campaignData.emails_sent_count > 0 ? (campaignData.bounced_count / campaignData.emails_sent_count) * 100 : 0;
   // const clickRate = campaignData.emails_sent_count > 0 ? (campaignData.link_click_count / campaignData.emails_sent_count) * 100 : 0;
 
+  // Manual refresh handler
+  const handleManualRefresh = () => {
+    fetchCampaignData(false);
+  };
+
+  // Format last updated time
+  const formatLastUpdated = () => {
+    if (!lastUpdated) return 'Never';
+    const now = new Date();
+    const diffMs = now.getTime() - lastUpdated.getTime();
+    const diffSeconds = Math.floor(diffMs / 1000);
+    
+    if (diffSeconds < 60) return `${diffSeconds}s ago`;
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    if (diffMinutes < 60) return `${diffMinutes}m ago`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    return `${diffHours}h ago`;
+  };
+
   return (
     <div className="max-w-7xl mx-auto animation-container transition-optimized">
       
@@ -148,8 +206,31 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
         className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden mb-6 gpu-accelerated"
         style={getAnimationStyle(animationState.overview)}
       >
-        <div className="p-5 border-b border-black border-opacity-6">
+        <div className="p-5 border-b border-black border-opacity-6 flex justify-between items-center">
           <h2 className="text-base font-semibold text-slate-900 tracking-tight">Campaign Overview</h2>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsPolling(!isPolling)}
+                className={`w-6 h-6 rounded-full transition-all duration-200 ${
+                  isPolling ? 'bg-green-500' : 'bg-slate-300'
+                }`}
+                title={isPolling ? 'Auto-refresh ON (30s)' : 'Auto-refresh OFF'}
+              >
+                <div className={`w-2 h-2 rounded-full bg-white mx-auto transition-transform duration-200 ${
+                  isPolling ? 'scale-100' : 'scale-75'
+                }`} />
+              </button>
+              <span className="text-xs text-slate-500">Updated {formatLastUpdated()}</span>
+            </div>
+            <button
+              onClick={handleManualRefresh}
+              className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105"
+              disabled={loading}
+            >
+              {loading ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
         </div>
         <div className="p-5">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -159,7 +240,9 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
             </div>
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Daily Limit</div>
-              <div className="text-sm font-semibold text-slate-900">5 emails/day</div>
+              <div className="text-sm font-semibold text-slate-900">
+                {lastUpdated ? '7 emails/day' : '5 emails/day'} {/* Will update from API when available */}
+              </div>
             </div>
             <div className="flex flex-col gap-1">
               <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Sequence</div>
