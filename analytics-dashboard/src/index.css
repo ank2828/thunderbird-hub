@@ -2,11 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Performance Optimizations */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 /* Default black background for the app */
 body {
   background-color: #000000;
   margin: 0;
   padding: 0;
+  font-display: swap;
+  will-change: auto;
+}
+
+/* GPU Acceleration for animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize animations for 60fps */
+.smooth-animation {
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 /* Flowing lines animations for hero section */

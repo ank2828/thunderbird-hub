@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { memo } from 'react'
 
-const FlowingLines: React.FC = () => {
+const FlowingLines: React.FC = memo(() => {
   return (
     <div 
+      className="gpu-accelerated"
       style={{ 
         position: 'fixed',
         top: 0,
@@ -11,7 +12,8 @@ const FlowingLines: React.FC = () => {
         height: '100vh',
         zIndex: 1,
         pointerEvents: 'none',
-        overflow: 'visible'
+        overflow: 'visible',
+        willChange: 'transform'
       }}
     >
       <svg
@@ -19,7 +21,11 @@ const FlowingLines: React.FC = () => {
         height="100%"
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        style={{ opacity: 0.9 }}
+        style={{ 
+          opacity: 0.9,
+          transform: 'translateZ(0)',
+          willChange: 'transform'
+        }}
       >
         {/* Upper Group - Two lines above the text */}
         {/* Line 1: Top flowing line - above THUNDERBIRD LABS */}
@@ -61,6 +67,8 @@ const FlowingLines: React.FC = () => {
       </svg>
     </div>
   )
-}
+})
+
+FlowingLines.displayName = 'FlowingLines'
 
 export default FlowingLines

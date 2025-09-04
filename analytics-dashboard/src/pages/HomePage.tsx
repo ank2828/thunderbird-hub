@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import FlowingLines from '../components/FlowingLines'
 
 function HomePage() {
@@ -7,10 +7,26 @@ function HomePage() {
   const [activeButton, setActiveButton] = useState<'email' | 'linkedin' | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
   const [screenDimensions, setScreenDimensions] = useState({ width: 1920, height: 1080 })
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  // Memoize scale calculation for better performance
+  const scaleMultiplier = useMemo(() => 
+    Math.max(screenDimensions.width / 1000, screenDimensions.height / 600) * 2.3,
+    [screenDimensions]
+  )
+
+  // Optimize resize handling with debouncing
+  const handleResize = useCallback(() => {
+    setScreenDimensions({ width: window.innerWidth, height: window.innerHeight })
+  }, [])
 
   useEffect(() => {
     setScreenDimensions({ width: window.innerWidth, height: window.innerHeight })
-  }, [])
+    setIsLoaded(true)
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [handleResize])
 
   const handleNavigation = (destination: 'email' | 'linkedin') => {
     if (isAnimating) return
@@ -26,18 +42,25 @@ function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
+    <div 
+      className="min-h-screen bg-black relative overflow-hidden smooth-animation"
+      style={{
+        opacity: isLoaded ? 1 : 0,
+        transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
+      }}
+    >
       {/* Animated flowing lines behind everything - full screen */}
       <FlowingLines />
       
-      <main className="min-h-screen flex flex-col px-8 py-12 relative z-10">
+      <main className="min-h-screen flex flex-col px-8 py-12 relative z-10 gpu-accelerated">
         {/* Hero Text */}
         <div 
-          className="text-center mb-8 relative" 
+          className="text-center mb-8 relative gpu-accelerated" 
           style={{ 
             paddingTop: '120px',
-            opacity: isAnimating ? 0 : 1,
-            transition: 'opacity 800ms ease-out',
+            opacity: isAnimating ? 0 : (isLoaded ? 1 : 0),
+            transform: isLoaded ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
             height: '400px'
           }}
         >
@@ -86,7 +109,7 @@ function HomePage() {
             {/* Module Box 1 - Sunset Email */}
             <button 
               onClick={() => handleNavigation('email')}
-              className="cursor-pointer"
+              className="cursor-pointer gpu-accelerated smooth-animation"
               disabled={isAnimating}
               style={{ 
                 width: '600px', 
@@ -100,14 +123,15 @@ function HomePage() {
                 backgroundRepeat: 'no-repeat',
                 borderRadius: activeButton === 'email' ? '0' : '3rem',
                 marginRight: '30px',
-                opacity: activeButton === 'linkedin' ? 0 : 1,
+                opacity: activeButton === 'linkedin' ? 0 : (isLoaded ? 1 : 0),
                 transform: activeButton === 'email' 
-                  ? `scale(${Math.max(screenDimensions.width / 1000, screenDimensions.height / 600) * 2.3})` 
-                  : 'scale(1)',
+                  ? `scale(${scaleMultiplier}) translateZ(0)` 
+                  : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.95) translateZ(0)',
                 transformOrigin: 'center center',
-                transition: 'transform 1200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 1200ms ease-out, border-radius 1200ms ease-out',
+                transition: 'transform 1200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 1200ms cubic-bezier(0.4, 0, 0.2, 1)',
                 zIndex: activeButton === 'email' ? 50 : 1,
-                position: 'relative'
+                position: 'relative',
+                willChange: 'transform, opacity, border-radius'
               }}
               aria-label="Email Module"
             />
@@ -115,7 +139,7 @@ function HomePage() {
             {/* Module Box 2 - Blue LinkedIn */}
             <button 
               onClick={() => handleNavigation('linkedin')}
-              className="cursor-pointer"
+              className="cursor-pointer gpu-accelerated smooth-animation"
               disabled={isAnimating}
               style={{ 
                 width: '600px', 
@@ -129,14 +153,15 @@ function HomePage() {
                 backgroundRepeat: 'no-repeat',
                 borderRadius: activeButton === 'linkedin' ? '0' : '3rem',
                 marginLeft: '30px',
-                opacity: activeButton === 'email' ? 0 : 1,
+                opacity: activeButton === 'email' ? 0 : (isLoaded ? 1 : 0),
                 transform: activeButton === 'linkedin' 
-                  ? `scale(${Math.max(screenDimensions.width / 1000, screenDimensions.height / 600) * 2.3})` 
-                  : 'scale(1)',
+                  ? `scale(${scaleMultiplier}) translateZ(0)` 
+                  : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.95) translateZ(0)',
                 transformOrigin: 'center center',
-                transition: 'transform 1200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 1200ms ease-out, border-radius 1200ms ease-out',
+                transition: 'transform 1200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 1200ms cubic-bezier(0.4, 0, 0.2, 1)',
                 zIndex: activeButton === 'linkedin' ? 50 : 1,
-                position: 'relative'
+                position: 'relative',
+                willChange: 'transform, opacity, border-radius'
               }}
               aria-label="LinkedIn Module"
             />
