@@ -40,15 +40,15 @@ function EmailDashboard() {
       }
     };
 
-    // Start page visibility animation after transition overlay begins
+    // Start page visibility animation earlier for smoother handoff
     setTimeout(() => {
       setIsVisible(true)
-    }, 400)
+    }, 200)
 
     // Complete the global transition
     setTimeout(() => {
       completeTransition()
-    }, 1000)
+    }, 800)
 
     fetchCampaignData();
   }, [completeTransition]);
@@ -60,9 +60,9 @@ function EmailDashboard() {
       className="min-h-screen p-8 gpu-accelerated"
       style={{
         background: 'linear-gradient(135deg, #f87171, #fb923c, #f97316)',
-        opacity: isVisible ? 1 : 0,
-        transform: isVisible ? 'scale(1)' : 'scale(1.05)',
-        transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)'
+        opacity: isVisible ? 1 : 0.3,
+        transform: isVisible ? 'scale(1)' : 'scale(1.02)',
+        transition: 'opacity 600ms cubic-bezier(0.4, 0, 0.2, 1), transform 600ms cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
       {/* Dashboard Header */}

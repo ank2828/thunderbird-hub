@@ -90,13 +90,17 @@ export const TransitionProvider: React.FC<TransitionProviderProps> = ({ children
                   transform: scale(1) translateZ(0);
                   opacity: 1;
                 }
-                40% {
+                45% {
                   transform: scale(2.2) translateZ(0);
                   opacity: 1;
                 }
-                70% {
+                75% {
                   transform: scale(2.8) translateZ(0);
-                  opacity: 0.6;
+                  opacity: 1;
+                }
+                90% {
+                  transform: scale(3.2) translateZ(0);
+                  opacity: 0.9;
                 }
                 100% {
                   transform: scale(3.5) translateZ(0);
