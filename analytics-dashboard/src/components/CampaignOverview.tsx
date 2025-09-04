@@ -109,11 +109,11 @@ const CampaignOverview = () => {
 
   if (!campaignData) return null;
 
-  // Calculate metrics
-  const openRate = campaignData.emails_sent_count > 0 ? (campaignData.open_count / campaignData.emails_sent_count) * 100 : 0;
-  const replyRate = campaignData.emails_sent_count > 0 ? (campaignData.reply_count / campaignData.emails_sent_count) * 100 : 0;
-  const bounceRate = campaignData.emails_sent_count > 0 ? (campaignData.bounced_count / campaignData.emails_sent_count) * 100 : 0;
-  const clickRate = campaignData.emails_sent_count > 0 ? (campaignData.link_click_count / campaignData.emails_sent_count) * 100 : 0;
+  // Calculate metrics (for future use)
+  // const openRate = campaignData.emails_sent_count > 0 ? (campaignData.open_count / campaignData.emails_sent_count) * 100 : 0;
+  // const replyRate = campaignData.emails_sent_count > 0 ? (campaignData.reply_count / campaignData.emails_sent_count) * 100 : 0;
+  // const bounceRate = campaignData.emails_sent_count > 0 ? (campaignData.bounced_count / campaignData.emails_sent_count) * 100 : 0;
+  // const clickRate = campaignData.emails_sent_count > 0 ? (campaignData.link_click_count / campaignData.emails_sent_count) * 100 : 0;
 
   return (
     <div className="max-w-7xl mx-auto" style={{

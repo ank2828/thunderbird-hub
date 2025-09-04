@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const INSTANTLY_API_KEY = 'MmQ4NzQ5ZWUtMGFmNC00MDQ3LWI5NDktZTZjYjU2NzkzMjYyOlpsWWtyaFJnUm5zTA=='
+// API key is now handled by serverless function
+// const INSTANTLY_API_KEY = 'MmQ4NzQ5ZWUtMGFmNC00MDQ3LWI5NDktZTZjYjU2NzkzMjYyOlpsWWtyaFJnUm5zTA=='
 // Use the Vite proxy instead of direct API call to avoid CORS
 const INSTANTLY_API_BASE_URL = '/api/instantly'
 
