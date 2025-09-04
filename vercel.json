@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd analytics-dashboard && npm run build",
+  "outputDirectory": "analytics-dashboard/dist",
+  "installCommand": "cd analytics-dashboard && npm install",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
