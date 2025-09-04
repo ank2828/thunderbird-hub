@@ -11,9 +11,9 @@ function HomePage() {
   const [screenDimensions, setScreenDimensions] = useState({ width: 1920, height: 1080 })
   const [isLoaded, setIsLoaded] = useState(false)
 
-  // Memoize scale calculation for better performance
+  // Memoize scale calculation for better performance - reduced for image quality
   const scaleMultiplier = useMemo(() => 
-    Math.max(screenDimensions.width / 1000, screenDimensions.height / 600) * 2.3,
+    Math.max(screenDimensions.width / 1200, screenDimensions.height / 800) * 1.6,
     [screenDimensions]
   )
 
@@ -39,11 +39,11 @@ function HomePage() {
     // Start the seamless transition
     startTransition(destination)
     
-    // Navigate immediately - the transition overlay handles the visual continuity
+    // Navigate with optimized timing for smooth handoff
     setTimeout(() => {
       const routePath = destination === 'email' ? '/email-dashboard' : '/linkedin-dashboard'
       navigate(routePath)
-    }, 600) // Reduced timing for smoother handoff
+    }, 500) // Optimized timing for crisp transition
   }
 
   return (
@@ -131,9 +131,9 @@ function HomePage() {
                 opacity: activeButton === 'linkedin' ? 0 : (isLoaded ? 1 : 0),
                 transform: activeButton === 'email' 
                   ? `scale(${scaleMultiplier}) translateZ(0)` 
-                  : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.95) translateZ(0)',
+                  : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.98) translateZ(0)',
                 transformOrigin: 'center center',
-                transition: 'transform 1200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 1200ms cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'transform 1000ms cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 1000ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 1000ms cubic-bezier(0.4, 0, 0.2, 1)',
                 zIndex: activeButton === 'email' ? 50 : 1,
                 position: 'relative',
                 willChange: 'transform, opacity, border-radius'
@@ -161,9 +161,9 @@ function HomePage() {
                 opacity: activeButton === 'email' ? 0 : (isLoaded ? 1 : 0),
                 transform: activeButton === 'linkedin' 
                   ? `scale(${scaleMultiplier}) translateZ(0)` 
-                  : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.95) translateZ(0)',
+                  : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.98) translateZ(0)',
                 transformOrigin: 'center center',
-                transition: 'transform 1200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 1200ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 1200ms cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'transform 1000ms cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 1000ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 1000ms cubic-bezier(0.4, 0, 0.2, 1)',
                 zIndex: activeButton === 'linkedin' ? 50 : 1,
                 position: 'relative',
                 willChange: 'transform, opacity, border-radius'

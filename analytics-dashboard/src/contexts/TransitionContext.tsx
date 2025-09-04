@@ -79,8 +79,9 @@ export const TransitionProvider: React.FC<TransitionProviderProps> = ({ children
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              animation: 'seamlessTransition 2000ms cubic-bezier(0.23, 1, 0.32, 1) forwards',
-              willChange: 'transform, opacity'
+              animation: 'seamlessTransition 1800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+              willChange: 'transform, opacity',
+              imageRendering: 'crisp-edges'
             }}
           />
           <style>
@@ -90,20 +91,20 @@ export const TransitionProvider: React.FC<TransitionProviderProps> = ({ children
                   transform: scale(1) translateZ(0);
                   opacity: 1;
                 }
-                45% {
-                  transform: scale(2.2) translateZ(0);
+                30% {
+                  transform: scale(1.4) translateZ(0);
                   opacity: 1;
                 }
-                75% {
-                  transform: scale(2.8) translateZ(0);
+                60% {
+                  transform: scale(1.7) translateZ(0);
                   opacity: 1;
                 }
-                90% {
-                  transform: scale(3.2) translateZ(0);
-                  opacity: 0.9;
+                80% {
+                  transform: scale(1.9) translateZ(0);
+                  opacity: 0.95;
                 }
                 100% {
-                  transform: scale(3.5) translateZ(0);
+                  transform: scale(2.1) translateZ(0);
                   opacity: 0;
                 }
               }
