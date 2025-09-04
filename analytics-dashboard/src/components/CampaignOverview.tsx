@@ -118,7 +118,7 @@ const CampaignOverview = () => {
   return (
     <div className="max-w-7xl mx-auto" style={{
       opacity: dataLoaded ? 1 : 0,
-      transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
+      transform: dataLoaded ? 'scale(1) translateZ(0)' : 'scale(0.95) translateZ(-10px)',
       transition: 'opacity 0.6s ease-out, transform 0.6s ease-out'
     }}>
       
@@ -166,7 +166,7 @@ const CampaignOverview = () => {
           <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2"
                style={{
                  opacity: dataLoaded ? 1 : 0,
-                 transform: dataLoaded ? 'translateY(0)' : 'translateY(10px)',
+                 transform: dataLoaded ? 'scale(1)' : 'scale(0.9)',
                  transition: 'opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s'
                }}>
             {dataLoaded ? (campaignData.leads_count?.toLocaleString() || 0) : ''}
@@ -187,7 +187,7 @@ const CampaignOverview = () => {
           <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2"
                style={{
                  opacity: dataLoaded ? 1 : 0,
-                 transform: dataLoaded ? 'translateY(0)' : 'translateY(10px)',
+                 transform: dataLoaded ? 'scale(1)' : 'scale(0.9)',
                  transition: 'opacity 0.5s ease-out 0.3s, transform 0.5s ease-out 0.3s'
                }}>
             {dataLoaded ? (campaignData.emails_sent_count?.toLocaleString() || 0) : ''}
@@ -208,7 +208,7 @@ const CampaignOverview = () => {
           <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2"
                style={{
                  opacity: dataLoaded ? 1 : 0,
-                 transform: dataLoaded ? 'translateY(0)' : 'translateY(10px)',
+                 transform: dataLoaded ? 'scale(1)' : 'scale(0.9)',
                  transition: 'opacity 0.5s ease-out 0.4s, transform 0.5s ease-out 0.4s'
                }}>
             {dataLoaded ? (campaignData.open_count?.toLocaleString() || 0) : ''}
@@ -231,7 +231,7 @@ const CampaignOverview = () => {
           <div className="text-3xl font-extrabold text-slate-900 leading-none mb-2"
                style={{
                  opacity: dataLoaded ? 1 : 0,
-                 transform: dataLoaded ? 'translateY(0)' : 'translateY(10px)',
+                 transform: dataLoaded ? 'scale(1)' : 'scale(0.9)',
                  transition: 'opacity 0.5s ease-out 0.5s, transform 0.5s ease-out 0.5s'
                }}>
             {dataLoaded ? (campaignData.reply_count?.toLocaleString() || 0) : ''}
