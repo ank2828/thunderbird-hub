@@ -69,12 +69,15 @@ const CampaignOverview = () => {
               }, delay);
             };
 
-            triggerAnimation('overview', animationConfig.delays.overview);
-            triggerAnimation('card1', animationConfig.delays.card1);
-            triggerAnimation('card2', animationConfig.delays.card2);
-            triggerAnimation('card3', animationConfig.delays.card3);
-            triggerAnimation('card4', animationConfig.delays.card4);
-            triggerAnimation('performance', animationConfig.delays.performance);
+            // Apple-style: Cards only animate AFTER page transition is complete
+            setTimeout(() => {
+              triggerAnimation('overview', 0);
+              triggerAnimation('card1', animationConfig.delays.card1);
+              triggerAnimation('card2', animationConfig.delays.card2);
+              triggerAnimation('card3', animationConfig.delays.card3);
+              triggerAnimation('card4', animationConfig.delays.card4);
+              triggerAnimation('performance', animationConfig.delays.performance);
+            }, 400); // Wait for transition to settle
           });
         } else {
           console.log('No campaigns found in response');
@@ -185,7 +188,7 @@ const CampaignOverview = () => {
   // const clickRate = campaignData.emails_sent_count > 0 ? (campaignData.link_click_count / campaignData.emails_sent_count) * 100 : 0;
 
   return (
-    <div className="max-w-7xl mx-auto animation-container">
+    <div className="max-w-7xl mx-auto animation-container transition-optimized">
       
       {/* Campaign Overview */}
       <div 

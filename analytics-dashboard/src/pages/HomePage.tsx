@@ -33,17 +33,23 @@ function HomePage() {
   const handleNavigation = (destination: 'email' | 'linkedin') => {
     if (isAnimating) return
     
+    // Apple-style: Single coordinated motion sequence
     setIsAnimating(true)
     setActiveButton(destination)
     
-    // Start the seamless transition
-    startTransition(destination)
-    
-    // Navigate with optimized timing for smooth handoff
-    setTimeout(() => {
-      const routePath = destination === 'email' ? '/email-dashboard' : '/linkedin-dashboard'
-      navigate(routePath)
-    }, 500) // Optimized timing for crisp transition
+    // Phase 1: Immediate visual feedback (0ms)
+    requestAnimationFrame(() => {
+      // Phase 2: Start transition overlay after button begins scaling (100ms)
+      setTimeout(() => {
+        startTransition(destination)
+      }, 100)
+      
+      // Phase 3: Navigate at perfect handoff moment (400ms)
+      setTimeout(() => {
+        const routePath = destination === 'email' ? '/email-dashboard' : '/linkedin-dashboard'
+        navigate(routePath)
+      }, 400)
+    })
   }
 
   return (
@@ -65,7 +71,9 @@ function HomePage() {
             paddingTop: '120px',
             opacity: isAnimating ? 0 : (isLoaded ? 1 : 0),
             transform: isLoaded ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
+            transition: isAnimating 
+              ? 'opacity 200ms cubic-bezier(0.4, 0, 1, 1)' // Fast fade during transition
+              : 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)', // Normal load
             height: '400px'
           }}
         >
@@ -133,7 +141,9 @@ function HomePage() {
                   ? `scale(${scaleMultiplier}) translateZ(0)` 
                   : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.98) translateZ(0)',
                 transformOrigin: 'center center',
-                transition: 'transform 1000ms cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 1000ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 1000ms cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: isAnimating 
+                  ? 'transform 600ms cubic-bezier(0.2, 0, 0, 1), opacity 300ms cubic-bezier(0.4, 0, 1, 1), border-radius 600ms cubic-bezier(0.2, 0, 0, 1)' // Apple-style decisive
+                  : 'transform 800ms cubic-bezier(0.4, 0, 0.2, 1), opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 800ms cubic-bezier(0.4, 0, 0.2, 1)', // Normal
                 zIndex: activeButton === 'email' ? 50 : 1,
                 position: 'relative',
                 willChange: 'transform, opacity, border-radius'
@@ -163,7 +173,9 @@ function HomePage() {
                   ? `scale(${scaleMultiplier}) translateZ(0)` 
                   : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.98) translateZ(0)',
                 transformOrigin: 'center center',
-                transition: 'transform 1000ms cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 1000ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 1000ms cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: isAnimating 
+                  ? 'transform 600ms cubic-bezier(0.2, 0, 0, 1), opacity 300ms cubic-bezier(0.4, 0, 1, 1), border-radius 600ms cubic-bezier(0.2, 0, 0, 1)' // Apple-style decisive
+                  : 'transform 800ms cubic-bezier(0.4, 0, 0.2, 1), opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 800ms cubic-bezier(0.4, 0, 0.2, 1)', // Normal
                 zIndex: activeButton === 'linkedin' ? 50 : 1,
                 position: 'relative',
                 willChange: 'transform, opacity, border-radius'

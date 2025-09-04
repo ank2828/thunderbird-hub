@@ -36,10 +36,17 @@ body {
   transform: translateZ(0);
 }
 
-/* Prevent layout thrashing during animations */
+/* Apple-style render optimization */
 .animation-container {
   contain: layout style paint;
   isolation: isolate;
+  transform: translateZ(0); /* Force compositing layer */
+}
+
+/* Critical: Prevent render blocking during transitions */
+.transition-optimized {
+  content-visibility: auto;
+  contain-intrinsic-size: 1000px;
 }
 
 /* Performance-optimized card animations */

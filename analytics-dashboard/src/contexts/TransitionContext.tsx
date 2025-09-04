@@ -79,7 +79,7 @@ export const TransitionProvider: React.FC<TransitionProviderProps> = ({ children
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
-              animation: 'seamlessTransition 1800ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+              animation: 'seamlessTransition 1400ms cubic-bezier(0.2, 0, 0, 1) forwards',
               willChange: 'transform, opacity',
               imageRendering: 'crisp-edges'
             }}

@@ -40,15 +40,16 @@ function EmailDashboard() {
       }
     };
 
-    // Start page visibility animation earlier for smoother handoff
-    setTimeout(() => {
-      setIsVisible(true)
-    }, 200)
-
-    // Complete the global transition
-    setTimeout(() => {
-      completeTransition()
-    }, 800)
+    // Apple-style: Precise choreography - appear exactly when overlay is ready
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        setIsVisible(true)
+      }, 300) // Synchronized with transition overlay peak
+      
+      setTimeout(() => {
+        completeTransition()
+      }, 600) // Clean handoff
+    })
 
     fetchCampaignData();
   }, [completeTransition]);
