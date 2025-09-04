@@ -12,6 +12,8 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/email-dashboard" element={<EmailDashboard />} />
           <Route path="/linkedin-dashboard" element={<LinkedInDashboard />} />
+          {/* Catch-all route for 404s */}
+          <Route path="*" element={<HomePage />} />
         </Routes>
       </Router>
     </QueryProvider>
