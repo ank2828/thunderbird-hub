@@ -36,6 +36,31 @@ body {
   transform: translateZ(0);
 }
 
+/* Prevent layout thrashing during animations */
+.animation-container {
+  contain: layout style paint;
+  isolation: isolate;
+}
+
+/* Performance-optimized card animations */
+.metric-card {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  contain: layout style paint;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .smooth-animation,
+  .metric-card,
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Flowing lines animations for hero section */
 .flowing-line-1 {
   animation: ropeSwing1 6s ease-in-out infinite;

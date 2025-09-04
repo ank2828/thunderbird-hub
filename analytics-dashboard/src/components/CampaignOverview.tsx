@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { instantlyApi } from '../services/instantly';
 import type { CampaignAnalytics } from '../services/instantly';
 
@@ -6,7 +6,42 @@ const CampaignOverview = () => {
   const [campaignData, setCampaignData] = useState<CampaignAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  // Remove dataLoaded - using individual animation states now
+  const [animationState, setAnimationState] = useState({
+    overview: false,
+    card1: false,
+    card2: false,
+    card3: false,
+    card4: false,
+    performance: false
+  });
+
+  // Device performance detection and animation optimization
+  const animationConfig = useMemo(() => {
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    // Device performance heuristics
+    const isLowEndDevice = navigator.hardwareConcurrency <= 2 || 
+                          ((navigator as any).deviceMemory && (navigator as any).deviceMemory <= 4);
+    
+    const baseDelay = prefersReducedMotion ? 0 : (isLowEndDevice ? 50 : 100);
+    const duration = prefersReducedMotion ? 0 : (isLowEndDevice ? 400 : 800);
+    
+    return {
+      duration,
+      delays: {
+        overview: 0,
+        card1: baseDelay,
+        card2: baseDelay * 2,
+        card3: baseDelay * 3,
+        card4: baseDelay * 4,
+        performance: baseDelay * 5
+      },
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      prefersReducedMotion
+    };
+  }, []);
 
   useEffect(() => {
     const fetchCampaignData = async () => {
@@ -21,10 +56,26 @@ const CampaignOverview = () => {
         if (campaigns && campaigns.length > 0) {
           console.log('Setting campaign data:', campaigns[0]);
           setCampaignData(campaigns[0]);
-          // Add a small delay to ensure smooth animation
-          setTimeout(() => {
-            setDataLoaded(true);
-          }, 100);
+          // Trigger smooth staggered animations using RAF for optimal performance
+          requestAnimationFrame(() => {
+            // Initialize animation sequence
+            
+            // Staggered animation triggers with performance optimization
+            const triggerAnimation = (element: keyof typeof animationState, delay: number) => {
+              setTimeout(() => {
+                requestAnimationFrame(() => {
+                  setAnimationState(prev => ({ ...prev, [element]: true }));
+                });
+              }, delay);
+            };
+
+            triggerAnimation('overview', animationConfig.delays.overview);
+            triggerAnimation('card1', animationConfig.delays.card1);
+            triggerAnimation('card2', animationConfig.delays.card2);
+            triggerAnimation('card3', animationConfig.delays.card3);
+            triggerAnimation('card4', animationConfig.delays.card4);
+            triggerAnimation('performance', animationConfig.delays.performance);
+          });
         } else {
           console.log('No campaigns found in response');
           setError('No campaigns found');
@@ -39,7 +90,25 @@ const CampaignOverview = () => {
     };
 
     fetchCampaignData();
-  }, []);
+  }, [animationConfig]);
+
+  // Helper function for consistent animation styles
+  const getAnimationStyle = useCallback((isActive: boolean) => {
+    if (animationConfig.prefersReducedMotion) {
+      return {
+        opacity: 1,
+        transform: 'translateY(0) translateZ(0)',
+        transition: 'none'
+      };
+    }
+
+    return {
+      opacity: isActive ? 1 : 0,
+      transform: isActive ? 'translateY(0) translateZ(0)' : 'translateY(12px) translateZ(0)',
+      transition: `opacity ${animationConfig.duration}ms ${animationConfig.easing}, transform ${animationConfig.duration}ms ${animationConfig.easing}`,
+      willChange: isActive ? 'auto' : 'transform, opacity'
+    };
+  }, [animationConfig]);
 
   if (loading || !campaignData) {
     return (
@@ -116,17 +185,12 @@ const CampaignOverview = () => {
   // const clickRate = campaignData.emails_sent_count > 0 ? (campaignData.link_click_count / campaignData.emails_sent_count) * 100 : 0;
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto animation-container">
       
       {/* Campaign Overview */}
       <div 
         className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden mb-6 gpu-accelerated"
-        style={{
-          opacity: dataLoaded ? 1 : 0,
-          transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
-          transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
-          transitionDelay: '0ms'
-        }}
+        style={getAnimationStyle(animationState.overview)}
       >
         <div className="p-5 border-b border-black border-opacity-6">
           <h2 className="text-base font-semibold text-slate-900 tracking-tight">Campaign Overview</h2>
@@ -156,12 +220,10 @@ const CampaignOverview = () => {
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div 
-          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated"
+          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated metric-card"
           style={{
-            opacity: dataLoaded ? 1 : 0,
-            transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
-            transitionDelay: '100ms'
+            ...getAnimationStyle(animationState.card1),
+            transitionProperty: animationConfig.prefersReducedMotion ? 'none' : 'opacity, transform, border-color, box-shadow'
           }}
         >
           <div className="flex justify-between items-start mb-4">
@@ -182,12 +244,10 @@ const CampaignOverview = () => {
         </div>
         
         <div 
-          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated"
+          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated metric-card"
           style={{
-            opacity: dataLoaded ? 1 : 0,
-            transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
-            transitionDelay: '200ms'
+            ...getAnimationStyle(animationState.card2),
+            transitionProperty: animationConfig.prefersReducedMotion ? 'none' : 'opacity, transform, border-color, box-shadow'
           }}
         >
           <div className="flex justify-between items-start mb-4">
@@ -206,12 +266,10 @@ const CampaignOverview = () => {
         </div>
         
         <div 
-          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated"
+          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated metric-card"
           style={{
-            opacity: dataLoaded ? 1 : 0,
-            transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
-            transitionDelay: '300ms'
+            ...getAnimationStyle(animationState.card3),
+            transitionProperty: animationConfig.prefersReducedMotion ? 'none' : 'opacity, transform, border-color, box-shadow'
           }}
         >
           <div className="flex justify-between items-start mb-4">
@@ -233,12 +291,10 @@ const CampaignOverview = () => {
         </div>
         
         <div 
-          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated"
+          className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5 transition-all duration-200 hover:border-white hover:border-opacity-40 hover:-translate-y-0.5 hover:shadow-2xl gpu-accelerated metric-card"
           style={{
-            opacity: dataLoaded ? 1 : 0,
-            transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
-            transitionDelay: '400ms'
+            ...getAnimationStyle(animationState.card4),
+            transitionProperty: animationConfig.prefersReducedMotion ? 'none' : 'opacity, transform, border-color, box-shadow'
           }}
         >
           <div className="flex justify-between items-start mb-4">
@@ -262,12 +318,7 @@ const CampaignOverview = () => {
       {/* Performance Details */}
       <div 
         className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden gpu-accelerated"
-        style={{
-          opacity: dataLoaded ? 1 : 0,
-          transform: dataLoaded ? 'translateY(0)' : 'translateY(20px)',
-          transition: 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)',
-          transitionDelay: '500ms'
-        }}
+        style={getAnimationStyle(animationState.performance)}
       >
         <div className="p-5 border-b border-black border-opacity-6">
           <h2 className="text-base font-semibold text-slate-900 tracking-tight">Performance Breakdown</h2>
