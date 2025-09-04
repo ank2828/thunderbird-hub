@@ -117,58 +117,8 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
   }, [animationConfig]);
 
   if (loading || !campaignData) {
-    return (
-      <div className="max-w-7xl mx-auto">
-        {/* Campaign Overview - Loading */}
-        <div className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden mb-6">
-          <div className="p-5 border-b border-black border-opacity-6">
-            <h2 className="text-base font-semibold text-slate-900 tracking-tight">Campaign Overview</h2>
-          </div>
-          <div className="p-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="flex flex-col gap-1">
-                  <div className="h-3 bg-gray-200 rounded w-20 animate-pulse"></div>
-                  <div className="h-4 bg-gray-200 rounded w-32 animate-pulse"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        
-        {/* Key Metrics - Loading */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl p-5">
-              <div className="flex justify-between items-start mb-4">
-                <div className="h-3 bg-gray-200 rounded w-16 animate-pulse"></div>
-                <div className="w-6 h-6 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-              <div className="h-8 bg-gray-200 rounded w-12 mb-2 animate-pulse"></div>
-              <div className="h-3 bg-gray-200 rounded w-24 animate-pulse"></div>
-            </div>
-          ))}
-        </div>
-        
-        {/* Performance Breakdown - Loading */}
-        <div className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden">
-          <div className="p-5 border-b border-black border-opacity-6">
-            <h2 className="text-base font-semibold text-slate-900 tracking-tight">Performance Breakdown</h2>
-          </div>
-          <div className="p-5">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg">
-                  <div className="h-3 bg-gray-200 rounded w-16 animate-pulse"></div>
-                  <div className="h-6 bg-gray-200 rounded w-8 animate-pulse"></div>
-                  <div className="h-3 bg-gray-200 rounded w-12 animate-pulse"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    // Show nothing while loading - only your elegant animation will appear
+    return <div className="max-w-7xl mx-auto"></div>;
   }
 
   if (error) {
