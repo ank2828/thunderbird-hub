@@ -48,11 +48,11 @@ function EmailDashboard() {
     
     setTimeout(() => {
       setAllowCardAnimations(true) // Now allow cards to animate
-    }, 500) // Dashboard is fully visible, cards can start
+    }, 800) // Give dashboard time to fully settle before cards
     
     setTimeout(() => {
       completeTransition() // Clean up transition state
-    }, 600)
+    }, 900)
 
     fetchCampaignData();
   }, [completeTransition]);
@@ -78,9 +78,11 @@ function EmailDashboard() {
           ← Back to Hub
         </button>
         
-        <h1 className="text-white text-4xl font-bold drop-shadow-lg" style={{ fontFamily: 'Montserrat, system-ui, sans-serif' }}>
-          {campaignData?.campaign_name || 'Email Campaign Dashboard'}
-        </h1>
+        {campaignData?.campaign_name && (
+          <h1 className="text-white text-4xl font-bold drop-shadow-lg" style={{ fontFamily: 'Montserrat, system-ui, sans-serif' }}>
+            {campaignData.campaign_name}
+          </h1>
+        )}
         
         <div className={`px-4 py-2 rounded-2xl text-sm font-semibold backdrop-blur-lg ${status.class} bg-opacity-90`}>
           {status.text}

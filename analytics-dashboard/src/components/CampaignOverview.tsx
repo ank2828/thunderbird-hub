@@ -29,7 +29,7 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
     const isLowEndDevice = navigator.hardwareConcurrency <= 2 || 
                           ((navigator as any).deviceMemory && (navigator as any).deviceMemory <= 4);
     
-    const baseDelay = prefersReducedMotion ? 0 : (isLowEndDevice ? 50 : 100);
+    const baseDelay = prefersReducedMotion ? 0 : (isLowEndDevice ? 120 : 200);
     const duration = prefersReducedMotion ? 0 : (isLowEndDevice ? 400 : 800);
     
     return {
@@ -110,7 +110,7 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
 
     return {
       opacity: isActive ? 1 : 0,
-      transform: isActive ? 'translateY(0) translateZ(0)' : 'translateY(12px) translateZ(0)',
+      transform: isActive ? 'translateY(0) translateZ(0)' : 'translateY(24px) translateZ(0)',
       transition: `opacity ${animationConfig.duration}ms ${animationConfig.easing}, transform ${animationConfig.duration}ms ${animationConfig.easing}`,
       willChange: isActive ? 'auto' : 'transform, opacity'
     };
