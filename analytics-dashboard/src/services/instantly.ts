@@ -115,8 +115,11 @@ export const instantlyApi = {
       
       // Step 2: Get campaign details using the ID from analytics
       const details = await this.getCampaignDetails(campaignId);
-      console.log('Details response:', details);
-      console.log('Details campaign_status:', details.campaign_status || details.status);
+      console.log('🔍 DETAILS DEBUG - Full response:', details);
+      console.log('🔍 DETAILS DEBUG - email_list:', details.email_list);
+      console.log('🔍 DETAILS DEBUG - daily_limit:', details.daily_limit);
+      console.log('🔍 DETAILS DEBUG - campaign_status:', details.campaign_status || details.status);
+      console.log('🔍 DETAILS DEBUG - Available keys:', Object.keys(details || {}));
       
       return {
         analytics: campaignAnalytics,
