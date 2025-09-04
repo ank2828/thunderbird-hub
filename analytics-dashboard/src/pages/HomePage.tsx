@@ -126,7 +126,27 @@ function HomePage() {
                 willChange: 'transform, opacity, border-radius'
               }}
               aria-label="Email Module"
-            />
+            >
+              {/* Email Hub Logo */}
+              <div
+                className="absolute inset-0 flex items-center justify-center"
+              >
+                <div
+                  className="bg-white bg-opacity-95 backdrop-blur-lg border border-white border-opacity-30 rounded-2xl px-6 py-3 shadow-lg"
+                  style={{
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: '#1f2937',
+                    letterSpacing: '0.05em',
+                    textShadow: 'none',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  Email Hub
+                </div>
+              </div>
+            </button>
             
             {/* Module Box 2 - Blue LinkedIn */}
             <button 
@@ -158,7 +178,27 @@ function HomePage() {
                 willChange: 'transform, opacity, border-radius'
               }}
               aria-label="LinkedIn Module"
-            />
+            >
+              {/* LinkedIn Hub Logo */}
+              <div
+                className="absolute inset-0 flex items-center justify-center"
+              >
+                <div
+                  className="bg-white bg-opacity-95 backdrop-blur-lg border border-white border-opacity-30 rounded-2xl px-6 py-3 shadow-lg"
+                  style={{
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontSize: '18px',
+                    fontWeight: '700',
+                    color: '#1f2937',
+                    letterSpacing: '0.05em',
+                    textShadow: 'none',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  LinkedIn Hub
+                </div>
+              </div>
+            </button>
           </div>
         </div>
       </main>
