@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { id } = req.query
     
-    if (!id) {
+    if (!id || typeof id !== 'string') {
       res.status(400).json({ error: 'Campaign ID is required' })
       return
     }
@@ -30,12 +30,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const INSTANTLY_API_KEY = process.env.INSTANTLY_API_KEY || 'MmQ4NzQ5ZWUtMGFmNC00MDQ3LWI5NDktZTZjYjU2NzkzMjYyOlpsWWtyaFJnUm5zTA=='
     
     // Debug logging
-    console.log('Vercel Debug - Campaign ID:', id)
-    console.log('Vercel Debug - API Key (first 10 chars):', INSTANTLY_API_KEY.substring(0, 10) + '...')
-    console.log('Vercel Debug - Using env API key:', !!process.env.INSTANTLY_API_KEY)
+    console.log('Vercel Debug [Details] - Campaign ID:', id)
+    console.log('Vercel Debug [Details] - API Key (first 10 chars):', INSTANTLY_API_KEY.substring(0, 10) + '...')
+    console.log('Vercel Debug [Details] - Using env API key:', !!process.env.INSTANTLY_API_KEY)
     
     const response = await fetch(
-      `https://api.instantly.ai/api/v2/campaigns/analytics?id=${id}`,
+      `https://api.instantly.ai/api/v2/campaigns/${id}`,
       {
         method: 'GET',
         headers: {
@@ -52,16 +52,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const data = await response.json()
     
     // Debug logging for response
-    console.log('Vercel Debug - API Response:', JSON.stringify(data, null, 2))
+    console.log('Vercel Debug [Details] - API Response:', JSON.stringify(data, null, 2))
     
-    // Ensure we return an array
-    const campaigns = Array.isArray(data) ? data : [data]
-    
-    res.status(200).json(campaigns)
+    res.status(200).json(data)
   } catch (error) {
-    console.error('Error fetching campaign analytics:', error)
+    console.error('Error fetching campaign details:', error)
     res.status(500).json({ 
-      error: 'Failed to fetch campaign analytics',
+      error: 'Failed to fetch campaign details',
       details: error instanceof Error ? error.message : 'Unknown error'
     })
   }
