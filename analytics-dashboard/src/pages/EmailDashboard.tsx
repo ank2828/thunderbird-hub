@@ -10,6 +10,7 @@ function EmailDashboard() {
   const { completeTransition } = useTransition()
   const [campaignData, setCampaignData] = useState<CampaignAnalytics | null>(null)
   const [isVisible, setIsVisible] = useState(false)
+  const [allowCardAnimations, setAllowCardAnimations] = useState(false)
 
   // Function to convert status number to readable text
   const getStatusText = (status: number) => {
@@ -40,14 +41,18 @@ function EmailDashboard() {
       }
     };
 
-    // Clean entrance after homepage fade completes
+    // Coordinated timing sequence for smooth transition
     setTimeout(() => {
-      setIsVisible(true)
-    }, 100) // Quick appearance after navigation
+      setIsVisible(true) // Dashboard appears
+    }, 300) // Wait for homepage fade to complete
     
     setTimeout(() => {
-      completeTransition()
-    }, 200) // Clean up transition state
+      setAllowCardAnimations(true) // Now allow cards to animate
+    }, 500) // Dashboard is fully visible, cards can start
+    
+    setTimeout(() => {
+      completeTransition() // Clean up transition state
+    }, 600)
 
     fetchCampaignData();
   }, [completeTransition]);
@@ -58,7 +63,7 @@ function EmailDashboard() {
     <div 
       className="min-h-screen p-8 gpu-accelerated"
       style={{
-        background: 'linear-gradient(135deg, #f87171, #fb923c, #f97316)',
+        background: '#000000',
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? 'translateY(0) translateZ(0)' : 'translateY(20px) translateZ(0)',
         transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1), transform 400ms cubic-bezier(0.4, 0, 0.2, 1)'
@@ -83,7 +88,7 @@ function EmailDashboard() {
       </div>
 
       {/* Content */}
-      <CampaignOverview />
+      <CampaignOverview allowAnimations={allowCardAnimations} />
     </div>
   )
 }

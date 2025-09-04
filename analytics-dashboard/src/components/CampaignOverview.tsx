@@ -2,7 +2,11 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { instantlyApi } from '../services/instantly';
 import type { CampaignAnalytics } from '../services/instantly';
 
-const CampaignOverview = () => {
+interface CampaignOverviewProps {
+  allowAnimations?: boolean;
+}
+
+const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) => {
   const [campaignData, setCampaignData] = useState<CampaignAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,29 +60,7 @@ const CampaignOverview = () => {
         if (campaigns && campaigns.length > 0) {
           console.log('Setting campaign data:', campaigns[0]);
           setCampaignData(campaigns[0]);
-          // Trigger smooth staggered animations using RAF for optimal performance
-          requestAnimationFrame(() => {
-            // Initialize animation sequence
-            
-            // Staggered animation triggers with performance optimization
-            const triggerAnimation = (element: keyof typeof animationState, delay: number) => {
-              setTimeout(() => {
-                requestAnimationFrame(() => {
-                  setAnimationState(prev => ({ ...prev, [element]: true }));
-                });
-              }, delay);
-            };
-
-            // Elegant card entrance after dashboard appears
-            setTimeout(() => {
-              triggerAnimation('overview', 0);
-              triggerAnimation('card1', animationConfig.delays.card1);
-              triggerAnimation('card2', animationConfig.delays.card2);
-              triggerAnimation('card3', animationConfig.delays.card3);
-              triggerAnimation('card4', animationConfig.delays.card4);
-              triggerAnimation('performance', animationConfig.delays.performance);
-            }, 200); // Quick but elegant sequence
-          });
+          // Data loaded - animations will be triggered separately when allowed
         } else {
           console.log('No campaigns found in response');
           setError('No campaigns found');
@@ -94,6 +76,27 @@ const CampaignOverview = () => {
 
     fetchCampaignData();
   }, [animationConfig]);
+
+  // Separate effect to handle animation triggering when allowed
+  useEffect(() => {
+    if (allowAnimations && campaignData && !animationState.overview) {
+      // Data is loaded and we're allowed to animate
+      const triggerAnimation = (element: keyof typeof animationState, delay: number) => {
+        setTimeout(() => {
+          requestAnimationFrame(() => {
+            setAnimationState(prev => ({ ...prev, [element]: true }));
+          });
+        }, delay);
+      };
+
+      triggerAnimation('overview', 0);
+      triggerAnimation('card1', animationConfig.delays.card1);
+      triggerAnimation('card2', animationConfig.delays.card2);
+      triggerAnimation('card3', animationConfig.delays.card3);
+      triggerAnimation('card4', animationConfig.delays.card4);
+      triggerAnimation('performance', animationConfig.delays.performance);
+    }
+  }, [allowAnimations, campaignData, animationState.overview, animationConfig.delays]);
 
   // Helper function for consistent animation styles
   const getAnimationStyle = useCallback((isActive: boolean) => {
@@ -155,10 +158,10 @@ const CampaignOverview = () => {
           <div className="p-5">
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="flex flex-col gap-2 p-4 bg-black bg-opacity-80 border border-black border-opacity-4 rounded-lg">
-                  <div className="h-3 bg-gray-400 rounded w-16 animate-pulse opacity-50"></div>
-                  <div className="h-6 bg-gray-300 rounded w-8 animate-pulse opacity-50"></div>
-                  <div className="h-3 bg-gray-400 rounded w-12 animate-pulse opacity-50"></div>
+                <div key={i} className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg">
+                  <div className="h-3 bg-gray-200 rounded w-16 animate-pulse"></div>
+                  <div className="h-6 bg-gray-200 rounded w-8 animate-pulse"></div>
+                  <div className="h-3 bg-gray-200 rounded w-12 animate-pulse"></div>
                 </div>
               ))}
             </div>
@@ -328,56 +331,56 @@ const CampaignOverview = () => {
         </div>
         <div className="p-5">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            <div className="flex flex-col gap-2 p-4 bg-black bg-opacity-80 border border-black border-opacity-4 rounded-lg transition-all duration-200 hover:bg-black hover:bg-opacity-90 hover:border-black hover:border-opacity-8">
-              <div className="text-xs font-medium text-white uppercase tracking-wider opacity-70">Contacted</div>
-              <div className="text-xl font-bold text-white">
+            <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
+              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Contacted</div>
+              <div className="text-xl font-bold text-slate-900">
                 {campaignData.contacted_count?.toLocaleString() || 0}
               </div>
-              <div className="text-xs text-white font-medium opacity-70">Leads reached</div>
+              <div className="text-xs text-slate-500 font-medium opacity-70">Leads reached</div>
             </div>
             
-            <div className="flex flex-col gap-2 p-4 bg-black bg-opacity-80 border border-black border-opacity-4 rounded-lg transition-all duration-200 hover:bg-black hover:bg-opacity-90 hover:border-black hover:border-opacity-8">
-              <div className="text-xs font-medium text-white uppercase tracking-wider opacity-70">New Contacted</div>
-              <div className="text-xl font-bold text-white">
+            <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
+              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">New Contacted</div>
+              <div className="text-xl font-bold text-slate-900">
                 {campaignData.new_leads_contacted_count?.toLocaleString() || 0}
               </div>
-              <div className="text-xs text-white font-medium opacity-70">Fresh outreach</div>
+              <div className="text-xs text-slate-500 font-medium opacity-70">Fresh outreach</div>
             </div>
             
-            <div className="flex flex-col gap-2 p-4 bg-black bg-opacity-80 border border-black border-opacity-4 rounded-lg transition-all duration-200 hover:bg-black hover:bg-opacity-90 hover:border-black hover:border-opacity-8">
-              <div className="text-xs font-medium text-white uppercase tracking-wider opacity-70">Link Clicks</div>
-              <div className="text-xl font-bold text-white">
+            <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
+              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Link Clicks</div>
+              <div className="text-xl font-bold text-slate-900">
                 {campaignData.link_click_count?.toLocaleString() || 0}
               </div>
-              <div className="text-xs text-white font-medium opacity-70">
+              <div className="text-xs text-slate-500 font-medium opacity-70">
                 {campaignData.emails_sent_count > 0 ? ((campaignData.link_click_count / campaignData.emails_sent_count) * 100).toFixed(1) : 0}% rate
               </div>
             </div>
             
-            <div className="flex flex-col gap-2 p-4 bg-black bg-opacity-80 border border-black border-opacity-4 rounded-lg transition-all duration-200 hover:bg-black hover:bg-opacity-90 hover:border-black hover:border-opacity-8">
-              <div className="text-xs font-medium text-white uppercase tracking-wider opacity-70">Completed</div>
-              <div className="text-xl font-bold text-white">
+            <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
+              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Completed</div>
+              <div className="text-xl font-bold text-slate-900">
                 {campaignData.completed_count?.toLocaleString() || 0}
               </div>
-              <div className="text-xs text-white font-medium opacity-70">Sequence done</div>
+              <div className="text-xs text-slate-500 font-medium opacity-70">Sequence done</div>
             </div>
             
-            <div className="flex flex-col gap-2 p-4 bg-black bg-opacity-80 border border-black border-opacity-4 rounded-lg transition-all duration-200 hover:bg-black hover:bg-opacity-90 hover:border-black hover:border-opacity-8">
-              <div className="text-xs font-medium text-white uppercase tracking-wider opacity-70">Bounced</div>
-              <div className="text-xl font-bold text-white">
+            <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
+              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Bounced</div>
+              <div className="text-xl font-bold text-slate-900">
                 {campaignData.bounced_count?.toLocaleString() || 0}
               </div>
-              <div className="text-xs text-white font-medium opacity-70">
+              <div className="text-xs text-slate-500 font-medium opacity-70">
                 {campaignData.emails_sent_count > 0 ? ((campaignData.bounced_count / campaignData.emails_sent_count) * 100).toFixed(1) : 0}% rate
               </div>
             </div>
             
-            <div className="flex flex-col gap-2 p-4 bg-black bg-opacity-80 border border-black border-opacity-4 rounded-lg transition-all duration-200 hover:bg-black hover:bg-opacity-90 hover:border-black hover:border-opacity-8">
-              <div className="text-xs font-medium text-white uppercase tracking-wider opacity-70">Opportunities</div>
-              <div className="text-xl font-bold text-white">
+            <div className="flex flex-col gap-2 p-4 bg-white bg-opacity-95 border border-white border-opacity-20 rounded-lg transition-all duration-200 hover:bg-white hover:bg-opacity-100 hover:border-white hover:border-opacity-40">
+              <div className="text-xs font-medium text-slate-500 uppercase tracking-wider opacity-70">Opportunities</div>
+              <div className="text-xl font-bold text-slate-900">
                 {campaignData.total_opportunities?.toLocaleString() || 0}
               </div>
-              <div className="text-xs text-white font-medium opacity-70">
+              <div className="text-xs text-slate-500 font-medium opacity-70">
                 ${campaignData.total_opportunity_value?.toLocaleString() || 0} value
               </div>
             </div>
