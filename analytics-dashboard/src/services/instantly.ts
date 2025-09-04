@@ -69,17 +69,21 @@ export const instantlyApi = {
 
   async getCampaignDetails(campaignId: string): Promise<CampaignDetails> {
     try {
-      console.log('Making API call to get campaign details for ID:', campaignId);
+      console.log('🚀 Making API call to get campaign details for ID:', campaignId);
+      console.log('🚀 API URL will be:', `${INSTANTLY_API_BASE_URL}/campaigns/${campaignId}`);
       
       const response = await axios.get(`${INSTANTLY_API_BASE_URL}/campaigns/${campaignId}`);
       
-      console.log('Campaign Details Response:', response.data);
+      console.log('✅ Campaign Details Response received:', response.data);
+      console.log('✅ Response status:', response.status);
       return response.data || {}
     } catch (error) {
-      console.error('Error fetching campaign details:', error);
+      console.error('❌ CAMPAIGN DETAILS ERROR:', error);
       if (error instanceof Error) {
-        console.error('Error response:', (error as any).response?.data);
-        console.error('Error status:', (error as any).response?.status);
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error response data:', (error as any).response?.data);
+        console.error('❌ Error response status:', (error as any).response?.status);
+        console.error('❌ Error response headers:', (error as any).response?.headers);
       }
       throw error instanceof Error ? error : new Error('Failed to fetch campaign details')
     }
@@ -114,12 +118,24 @@ export const instantlyApi = {
       console.log('Analytics campaign_status:', campaignAnalytics.campaign_status);
       
       // Step 2: Get campaign details using the ID from analytics
-      const details = await this.getCampaignDetails(campaignId);
-      console.log('🔍 DETAILS DEBUG - Full response:', details);
-      console.log('🔍 DETAILS DEBUG - email_list:', details.email_list);
-      console.log('🔍 DETAILS DEBUG - daily_limit:', details.daily_limit);
-      console.log('🔍 DETAILS DEBUG - campaign_status:', details.campaign_status || details.status);
-      console.log('🔍 DETAILS DEBUG - Available keys:', Object.keys(details || {}));
+      console.log('🚀 ABOUT TO CALL getCampaignDetails with ID:', campaignId);
+      
+      let details;
+      try {
+        details = await this.getCampaignDetails(campaignId);
+        console.log('✅ SUCCESS - Details API call completed');
+        console.log('🔍 DETAILS DEBUG - Full response:', details);
+        console.log('🔍 DETAILS DEBUG - email_list:', details.email_list);
+        console.log('🔍 DETAILS DEBUG - daily_limit:', details.daily_limit);
+        console.log('🔍 DETAILS DEBUG - campaign_status:', details.campaign_status || details.status);
+        console.log('🔍 DETAILS DEBUG - Available keys:', Object.keys(details || {}));
+      } catch (detailsError) {
+        console.error('❌ DETAILS API ERROR:', detailsError);
+        console.error('❌ Error details:', detailsError.message);
+        console.error('❌ Error stack:', detailsError.stack);
+        // Fallback to empty details object
+        details = {};
+      }
       
       return {
         analytics: campaignAnalytics,
