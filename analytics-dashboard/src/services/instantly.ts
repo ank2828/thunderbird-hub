@@ -131,15 +131,20 @@ export const instantlyApi = {
         console.log('🔍 DETAILS DEBUG - Available keys:', Object.keys(details || {}));
       } catch (detailsError) {
         console.error('❌ DETAILS API ERROR:', detailsError);
-        console.error('❌ Error details:', detailsError.message);
-        console.error('❌ Error stack:', detailsError.stack);
-        // Fallback to empty details object
-        details = {};
+        if (detailsError instanceof Error) {
+          console.error('❌ Error details:', detailsError.message);
+          console.error('❌ Error stack:', detailsError.stack);
+        }
+        // Fallback to empty details object with required fields
+        details = {
+          email_list: [],
+          daily_limit: 0
+        } as CampaignDetails;
       }
       
       return {
         analytics: campaignAnalytics,
-        details: details
+        details: details as CampaignDetails
       };
     } catch (error) {
       console.error('Error fetching complete campaign data:', error);
