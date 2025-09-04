@@ -40,16 +40,14 @@ function EmailDashboard() {
       }
     };
 
-    // Apple-style: Precise choreography - appear exactly when overlay is ready
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        setIsVisible(true)
-      }, 300) // Synchronized with transition overlay peak
-      
-      setTimeout(() => {
-        completeTransition()
-      }, 600) // Clean handoff
-    })
+    // Clean entrance after homepage fade completes
+    setTimeout(() => {
+      setIsVisible(true)
+    }, 100) // Quick appearance after navigation
+    
+    setTimeout(() => {
+      completeTransition()
+    }, 200) // Clean up transition state
 
     fetchCampaignData();
   }, [completeTransition]);
@@ -61,9 +59,9 @@ function EmailDashboard() {
       className="min-h-screen p-8 gpu-accelerated"
       style={{
         background: 'linear-gradient(135deg, #f87171, #fb923c, #f97316)',
-        opacity: isVisible ? 1 : 0.3,
-        transform: isVisible ? 'scale(1)' : 'scale(1.02)',
-        transition: 'opacity 600ms cubic-bezier(0.4, 0, 0.2, 1), transform 600ms cubic-bezier(0.4, 0, 0.2, 1)'
+        opacity: isVisible ? 1 : 0,
+        transform: isVisible ? 'translateY(0) translateZ(0)' : 'translateY(20px) translateZ(0)',
+        transition: 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1), transform 400ms cubic-bezier(0.4, 0, 0.2, 1)'
       }}
     >
       {/* Dashboard Header */}

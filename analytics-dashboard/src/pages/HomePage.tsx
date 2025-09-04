@@ -1,54 +1,29 @@
 import { useNavigate } from 'react-router-dom'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import FlowingLines from '../components/FlowingLines'
-import { useTransition } from '../contexts/TransitionContext'
 
 function HomePage() {
   const navigate = useNavigate()
-  const { startTransition } = useTransition()
-  const [activeButton, setActiveButton] = useState<'email' | 'linkedin' | null>(null)
   const [isAnimating, setIsAnimating] = useState(false)
-  const [screenDimensions, setScreenDimensions] = useState({ width: 1920, height: 1080 })
   const [isLoaded, setIsLoaded] = useState(false)
 
-  // Memoize scale calculation for better performance - reduced for image quality
-  const scaleMultiplier = useMemo(() => 
-    Math.max(screenDimensions.width / 1200, screenDimensions.height / 800) * 1.6,
-    [screenDimensions]
-  )
-
-  // Optimize resize handling with debouncing
-  const handleResize = useCallback(() => {
-    setScreenDimensions({ width: window.innerWidth, height: window.innerHeight })
-  }, [])
-
   useEffect(() => {
-    setScreenDimensions({ width: window.innerWidth, height: window.innerHeight })
     setIsLoaded(true)
-    
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [handleResize])
+  }, [])
 
   const handleNavigation = (destination: 'email' | 'linkedin') => {
     if (isAnimating) return
     
-    // Apple-style: Single coordinated motion sequence
+    // Elegant fade-out transition - no zoom, pure class
     setIsAnimating(true)
-    setActiveButton(destination)
     
-    // Phase 1: Immediate visual feedback (0ms)
+    // Phase 1: Immediate graceful fade begins (0ms)
     requestAnimationFrame(() => {
-      // Phase 2: Start transition overlay after button begins scaling (100ms)
-      setTimeout(() => {
-        startTransition(destination)
-      }, 100)
-      
-      // Phase 3: Navigate at perfect handoff moment (400ms)
+      // Phase 2: Navigate after elegant fade completes (600ms)
       setTimeout(() => {
         const routePath = destination === 'email' ? '/email-dashboard' : '/linkedin-dashboard'
         navigate(routePath)
-      }, 400)
+      }, 600)
     })
   }
 
@@ -61,7 +36,7 @@ function HomePage() {
       }}
     >
       {/* Animated flowing lines behind everything - full screen */}
-      <FlowingLines />
+      <FlowingLines isAnimating={isAnimating} />
       
       <main className="min-h-screen flex flex-col px-8 py-12 relative z-10 gpu-accelerated">
         {/* Hero Text */}
@@ -70,9 +45,11 @@ function HomePage() {
           style={{ 
             paddingTop: '120px',
             opacity: isAnimating ? 0 : (isLoaded ? 1 : 0),
-            transform: isLoaded ? 'translateY(0)' : 'translateY(20px)',
+            transform: isAnimating 
+              ? 'translateY(-40px) translateZ(0)' // Elegant rise and fade
+              : isLoaded ? 'translateY(0) translateZ(0)' : 'translateY(20px) translateZ(0)',
             transition: isAnimating 
-              ? 'opacity 200ms cubic-bezier(0.4, 0, 1, 1)' // Fast fade during transition
+              ? 'opacity 500ms cubic-bezier(0.4, 0, 0.2, 1), transform 500ms cubic-bezier(0.4, 0, 0.2, 1)' // Elegant fade
               : 'opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), transform 800ms cubic-bezier(0.4, 0, 0.2, 1)', // Normal load
             height: '400px'
           }}
@@ -134,17 +111,17 @@ function HomePage() {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
-                borderRadius: activeButton === 'email' ? '0' : '3rem',
+                borderRadius: '3rem', // Always maintain rounded corners
                 marginRight: '30px',
-                opacity: activeButton === 'linkedin' ? 0 : (isLoaded ? 1 : 0),
-                transform: activeButton === 'email' 
-                  ? `scale(${scaleMultiplier}) translateZ(0)` 
+                opacity: isAnimating ? 0 : (isLoaded ? 1 : 0),
+                transform: isAnimating 
+                  ? 'translateY(-30px) scale(0.95) translateZ(0)' // Gentle rise and slight scale
                   : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.98) translateZ(0)',
                 transformOrigin: 'center center',
                 transition: isAnimating 
-                  ? 'transform 600ms cubic-bezier(0.2, 0, 0, 1), opacity 300ms cubic-bezier(0.4, 0, 1, 1), border-radius 600ms cubic-bezier(0.2, 0, 0, 1)' // Apple-style decisive
-                  : 'transform 800ms cubic-bezier(0.4, 0, 0.2, 1), opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 800ms cubic-bezier(0.4, 0, 0.2, 1)', // Normal
-                zIndex: activeButton === 'email' ? 50 : 1,
+                  ? 'transform 500ms cubic-bezier(0.4, 0, 0.2, 1), opacity 500ms cubic-bezier(0.4, 0, 0.2, 1)' // Elegant fade
+                  : 'transform 800ms cubic-bezier(0.4, 0, 0.2, 1), opacity 800ms cubic-bezier(0.4, 0, 0.2, 1)', // Normal hover
+                zIndex: 1,
                 position: 'relative',
                 willChange: 'transform, opacity, border-radius'
               }}
@@ -166,17 +143,17 @@ function HomePage() {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
-                borderRadius: activeButton === 'linkedin' ? '0' : '3rem',
+                borderRadius: '3rem', // Always maintain rounded corners
                 marginLeft: '30px',
-                opacity: activeButton === 'email' ? 0 : (isLoaded ? 1 : 0),
-                transform: activeButton === 'linkedin' 
-                  ? `scale(${scaleMultiplier}) translateZ(0)` 
+                opacity: isAnimating ? 0 : (isLoaded ? 1 : 0),
+                transform: isAnimating 
+                  ? 'translateY(-30px) scale(0.95) translateZ(0)' // Gentle rise and slight scale
                   : isLoaded ? 'scale(1) translateZ(0)' : 'scale(0.98) translateZ(0)',
                 transformOrigin: 'center center',
                 transition: isAnimating 
-                  ? 'transform 600ms cubic-bezier(0.2, 0, 0, 1), opacity 300ms cubic-bezier(0.4, 0, 1, 1), border-radius 600ms cubic-bezier(0.2, 0, 0, 1)' // Apple-style decisive
-                  : 'transform 800ms cubic-bezier(0.4, 0, 0.2, 1), opacity 800ms cubic-bezier(0.4, 0, 0.2, 1), border-radius 800ms cubic-bezier(0.4, 0, 0.2, 1)', // Normal
-                zIndex: activeButton === 'linkedin' ? 50 : 1,
+                  ? 'transform 500ms cubic-bezier(0.4, 0, 0.2, 1), opacity 500ms cubic-bezier(0.4, 0, 0.2, 1)' // Elegant fade
+                  : 'transform 800ms cubic-bezier(0.4, 0, 0.2, 1), opacity 800ms cubic-bezier(0.4, 0, 0.2, 1)', // Normal hover
+                zIndex: 1,
                 position: 'relative',
                 willChange: 'transform, opacity, border-radius'
               }}

@@ -69,49 +69,7 @@ export const TransitionProvider: React.FC<TransitionProviderProps> = ({ children
     }}>
       {children}
       
-      {/* Global Transition Overlay */}
-      {transitionState.isTransitioning && (
-        <>
-          <div
-            className="fixed inset-0 z-[9999] pointer-events-none gpu-accelerated"
-            style={{
-              backgroundImage: `url(${transitionState.sourceImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              animation: 'seamlessTransition 1400ms cubic-bezier(0.2, 0, 0, 1) forwards',
-              willChange: 'transform, opacity',
-              imageRendering: 'crisp-edges'
-            }}
-          />
-          <style>
-            {`
-              @keyframes seamlessTransition {
-                0% {
-                  transform: scale(1) translateZ(0);
-                  opacity: 1;
-                }
-                30% {
-                  transform: scale(1.4) translateZ(0);
-                  opacity: 1;
-                }
-                60% {
-                  transform: scale(1.7) translateZ(0);
-                  opacity: 1;
-                }
-                80% {
-                  transform: scale(1.9) translateZ(0);
-                  opacity: 0.95;
-                }
-                100% {
-                  transform: scale(2.1) translateZ(0);
-                  opacity: 0;
-                }
-              }
-            `}
-          </style>
-        </>
-      )}
+      {/* No overlay needed - clean elegant transition */}
     </TransitionContext.Provider>
   )
 }

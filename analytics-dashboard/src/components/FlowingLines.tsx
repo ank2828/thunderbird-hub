@@ -1,6 +1,10 @@
 import React, { memo } from 'react'
 
-const FlowingLines: React.FC = memo(() => {
+interface FlowingLinesProps {
+  isAnimating?: boolean;
+}
+
+const FlowingLines: React.FC<FlowingLinesProps> = memo(({ isAnimating = false }) => {
   return (
     <div 
       className="gpu-accelerated"
@@ -13,7 +17,10 @@ const FlowingLines: React.FC = memo(() => {
         zIndex: 1,
         pointerEvents: 'none',
         overflow: 'visible',
-        willChange: 'transform'
+        opacity: isAnimating ? 0 : 0.9,
+        transform: isAnimating ? 'translateY(-20px) translateZ(0)' : 'translateY(0) translateZ(0)',
+        transition: isAnimating ? 'opacity 400ms cubic-bezier(0.4, 0, 0.2, 1), transform 400ms cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
+        willChange: 'transform, opacity'
       }}
     >
       <svg
@@ -22,7 +29,7 @@ const FlowingLines: React.FC = memo(() => {
         viewBox="0 0 100 100"
         preserveAspectRatio="none"
         style={{ 
-          opacity: 0.9,
+          opacity: 1,
           transform: 'translateZ(0)',
           willChange: 'transform'
         }}

@@ -69,7 +69,7 @@ const CampaignOverview = () => {
               }, delay);
             };
 
-            // Apple-style: Cards only animate AFTER page transition is complete
+            // Elegant card entrance after dashboard appears
             setTimeout(() => {
               triggerAnimation('overview', 0);
               triggerAnimation('card1', animationConfig.delays.card1);
@@ -77,7 +77,7 @@ const CampaignOverview = () => {
               triggerAnimation('card3', animationConfig.delays.card3);
               triggerAnimation('card4', animationConfig.delays.card4);
               triggerAnimation('performance', animationConfig.delays.performance);
-            }, 400); // Wait for transition to settle
+            }, 200); // Quick but elegant sequence
           });
         } else {
           console.log('No campaigns found in response');
