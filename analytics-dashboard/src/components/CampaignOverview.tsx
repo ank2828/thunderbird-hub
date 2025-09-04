@@ -179,24 +179,7 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
   // const bounceRate = campaignData.emails_sent_count > 0 ? (campaignData.bounced_count / campaignData.emails_sent_count) * 100 : 0;
   // const clickRate = campaignData.emails_sent_count > 0 ? (campaignData.link_click_count / campaignData.emails_sent_count) * 100 : 0;
 
-  // Manual refresh handler
-  const handleManualRefresh = () => {
-    fetchCampaignData(false);
-  };
-
-  // Format last updated time
-  const formatLastUpdated = () => {
-    if (!lastUpdated) return 'Never';
-    const now = new Date();
-    const diffMs = now.getTime() - lastUpdated.getTime();
-    const diffSeconds = Math.floor(diffMs / 1000);
-    
-    if (diffSeconds < 60) return `${diffSeconds}s ago`;
-    const diffMinutes = Math.floor(diffSeconds / 60);
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
-    const diffHours = Math.floor(diffMinutes / 60);
-    return `${diffHours}h ago`;
-  };
+  // Functions removed - no manual controls needed
 
   return (
     <div className="max-w-7xl mx-auto animation-container transition-optimized">
@@ -206,18 +189,8 @@ const CampaignOverview = ({ allowAnimations = false }: CampaignOverviewProps) =>
         className="bg-white bg-opacity-95 backdrop-blur-5 border border-white border-opacity-20 rounded-xl overflow-hidden mb-6 gpu-accelerated"
         style={getAnimationStyle(animationState.overview)}
       >
-        <div className="p-5 border-b border-black border-opacity-6 flex justify-between items-center">
+        <div className="p-5 border-b border-black border-opacity-6">
           <h2 className="text-base font-semibold text-slate-900 tracking-tight">Campaign Overview</h2>
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-500">Updated {formatLastUpdated()}</span>
-            <button
-              onClick={handleManualRefresh}
-              className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 hover:scale-105"
-              disabled={loading}
-            >
-              {loading ? 'Refreshing...' : 'Refresh'}
-            </button>
-          </div>
         </div>
         <div className="p-5">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
