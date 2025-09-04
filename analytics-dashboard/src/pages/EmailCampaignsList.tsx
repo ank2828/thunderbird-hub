@@ -13,10 +13,12 @@ const EmailCampaignsList = () => {
   const [showCards, setShowCards] = useState(false)
 
   useEffect(() => {
-    const fetchCampaigns = async () => {
+    const fetchCampaigns = async (isInitialLoad = false) => {
       try {
-        // Reset animation state when fetching
-        setShowCards(false)
+        // Only reset animation state on initial load, not on tab refocus
+        if (isInitialLoad) {
+          setShowCards(false)
+        }
         
         // First get all campaign analytics to get the list of campaigns
         const analyticsData = await instantlyApi.getCampaignAnalytics()
@@ -40,10 +42,15 @@ const EmailCampaignsList = () => {
         setCampaigns(campaignsWithDetails)
         setLoading(false)
         
-        // Start card animations after data is loaded
-        setTimeout(() => {
+        // Start card animations after data is loaded (only on initial load)
+        if (isInitialLoad) {
+          setTimeout(() => {
+            setShowCards(true)
+          }, 100)
+        } else if (!showCards) {
+          // If cards aren't showing yet (edge case), show them without animation
           setShowCards(true)
-        }, 100)
+        }
       } catch (error) {
         console.error('Error fetching campaigns:', error)
         setLoading(false)
@@ -59,8 +66,8 @@ const EmailCampaignsList = () => {
       completeTransition()
     }, 600)
 
-    // Initial fetch
-    fetchCampaigns()
+    // Initial fetch with animation
+    fetchCampaigns(true)
 
     // Set up polling for real-time updates
     const POLL_INTERVAL = 30000 // 30 seconds
@@ -71,15 +78,16 @@ const EmailCampaignsList = () => {
     const handleVisibilityChange = () => {
       isTabVisible = !document.hidden
       if (isTabVisible) {
-        // Refresh immediately when tab becomes visible
-        fetchCampaigns()
+        // Refresh data but don't re-animate cards
+        fetchCampaigns(false)
       }
     }
 
     // Start polling
     intervalId = setInterval(() => {
       if (isTabVisible && !loading) {
-        fetchCampaigns()
+        // Polling updates don't re-animate cards
+        fetchCampaigns(false)
       }
     }, POLL_INTERVAL)
 

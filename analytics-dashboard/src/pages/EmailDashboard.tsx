@@ -33,14 +33,20 @@ function EmailDashboard() {
   const getCurrentStatus = (campaignData: any) => {
     // Try details endpoint first (more current)
     const detailsStatus = campaignData?.details?.campaign_status ?? campaignData?.details?.status;
+    const analyticsStatus = campaignData?.analytics?.campaign_status;
+    
+    console.log('🔍 STATUS DEBUG - Analytics Status:', analyticsStatus);
+    console.log('🔍 STATUS DEBUG - Details Status:', detailsStatus);
+    console.log('🔍 STATUS DEBUG - Full Details Object:', campaignData?.details);
+    console.log('🔍 STATUS DEBUG - Full Analytics Object:', campaignData?.analytics);
+    
     if (detailsStatus !== undefined) {
-      console.log('Using status from details endpoint:', detailsStatus);
+      console.log('✅ Using status from details endpoint:', detailsStatus);
       return detailsStatus;
     }
     
     // Fallback to analytics endpoint
-    const analyticsStatus = campaignData?.analytics?.campaign_status;
-    console.log('Using status from analytics endpoint:', analyticsStatus);
+    console.log('⚠️ Using status from analytics endpoint:', analyticsStatus);
     return analyticsStatus;
   };
 

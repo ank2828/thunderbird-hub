@@ -134,9 +134,9 @@ function HomePage() {
                 <div
                   className="bg-white bg-opacity-95 backdrop-blur-lg border border-white border-opacity-30 rounded-2xl px-6 py-3 shadow-lg"
                   style={{
-                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontFamily: 'Montserrat, system-ui, sans-serif',
                     fontSize: '18px',
-                    fontWeight: '700',
+                    fontWeight: '100',
                     color: '#1f2937',
                     letterSpacing: '0.05em',
                     textShadow: 'none',
@@ -186,9 +186,9 @@ function HomePage() {
                 <div
                   className="bg-white bg-opacity-95 backdrop-blur-lg border border-white border-opacity-30 rounded-2xl px-6 py-3 shadow-lg"
                   style={{
-                    fontFamily: 'Inter, system-ui, sans-serif',
+                    fontFamily: 'Montserrat, system-ui, sans-serif',
                     fontSize: '18px',
-                    fontWeight: '700',
+                    fontWeight: '100',
                     color: '#1f2937',
                     letterSpacing: '0.05em',
                     textShadow: 'none',
